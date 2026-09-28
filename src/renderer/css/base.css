@@ -1,0 +1,89 @@
+/* Estilos básicos: reset, textos, campos e botões */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  font-family: var(--fonte);
+  font-size: 14px;
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 500; }
+h1 { font-size: 26px; }
+h2 { font-size: 21px; }
+h3 { font-size: 17px; }
+
+a { color: var(--cor-primaria); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Campos */
+input, select, textarea {
+  font: inherit;
+  color: inherit;
+  background: #fff;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: 7px 10px;
+  width: 100%;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+textarea { resize: vertical; min-height: 70px; }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px rgba(58, 134, 212, .15);
+}
+
+label.campo { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: var(--cor-texto-suave); }
+label.campo .obrigatorio { color: var(--cor-recusado); }
+
+/* Botões */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 14px;
+  border: 1px solid transparent;
+  border-radius: var(--raio);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background .15s, opacity .15s;
+  white-space: nowrap;
+}
+.btn:disabled { opacity: .6; cursor: default; }
+.btn svg { width: 16px; height: 16px; }
+
+.btn-primario { background: var(--cor-primaria); color: #fff; }
+.btn-primario:hover:not(:disabled) { background: var(--cor-primaria-escura); }
+
+.btn-secundario { background: var(--cor-botao-cinza); color: #fff; }
+.btn-secundario:hover:not(:disabled) { background: #59626c; }
+
+.btn-contorno { background: #fff; color: var(--cor-texto); border-color: var(--cor-borda); }
+.btn-contorno:hover:not(:disabled) { background: #f4f6f8; }
+
+.btn-perigo { background: var(--cor-recusado); color: #fff; }
+.btn-perigo:hover:not(:disabled) { background: #b53a33; }
+
+.btn-link { background: none; color: var(--cor-primaria); padding: 4px 6px; }
+.btn-link:hover { text-decoration: underline; }
+
+.btn-icone {
+  background: none;
+  border: none;
+  color: var(--cor-texto-suave);
+  padding: 5px;
+  border-radius: var(--raio);
+  cursor: pointer;
+  display: inline-flex;
+}
+.btn-icone:hover { background: #eef1f5; color: var(--cor-texto); }
+.btn-icone.perigo:hover { background: #fdecea; color: var(--cor-recusado); }
+.btn-icone svg { width: 17px; height: 17px; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #c5ccd4; border-radius: 10px; border: 2px solid var(--cor-fundo); }

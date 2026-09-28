@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Orçamento Nº {{numero}}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Roboto, Arial, sans-serif; color: #1f2933; font-size: 11.5pt; line-height: 1.45; }
+  .topo { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 16px; border-bottom: 3px solid #2f6fb5; }
+  .empresa { display: flex; gap: 12px; align-items: center; }
+  .empresa svg { width: 46px; height: 46px; flex: none; }
+  .empresa img.logo { max-width: 200px; max-height: 90px; object-fit: contain; flex: none; }
+  .empresa h1 { font-size: 17pt; font-weight: 600; color: #1f2d3d; }
+  .empresa p { font-size: 9.5pt; color: #5f6b7a; }
+  .titulo-doc { text-align: right; }
+  .titulo-doc .rotulo { font-size: 9pt; letter-spacing: 1.5px; color: #5f6b7a; }
+  .titulo-doc .numero { font-size: 20pt; font-weight: 700; color: #2f6fb5; }
+  .titulo-doc p { font-size: 9.5pt; color: #5f6b7a; }
+
+  .blocos { display: flex; gap: 16px; margin: 18px 0; }
+  .bloco { flex: 1; border: 1px solid #d6dce3; border-radius: 4px; padding: 10px 12px; }
+  .bloco h2 { font-size: 8.5pt; letter-spacing: 1.2px; color: #2f6fb5; margin-bottom: 4px; }
+  .bloco .nome { font-weight: 600; font-size: 12pt; }
+  .bloco p { font-size: 10pt; color: #3e4a57; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 9pt; letter-spacing: .6px; color: #fff; background: #2f6fb5; padding: 7px 10px; }
+  td { padding: 7px 10px; border-bottom: 1px solid #e3e7ec; font-size: 10.5pt; }
+  .num { text-align: right; white-space: nowrap; }
+  .cen { text-align: center; white-space: nowrap; }
+  tr.extra td { background: #f5f7fa; }
+  tr.total td { border-top: 2px solid #1f2933; border-bottom: none; font-size: 13pt; font-weight: 700; padding-top: 10px; }
+  tr.total td.num { color: #2f6fb5; }
+  .sem-itens { color: #8a94a0; font-style: italic; }
+
+  .obs { margin-top: 20px; border-left: 3px solid #2f6fb5; padding: 8px 12px; background: #f5f7fa; }
+  .obs h2 { font-size: 8.5pt; letter-spacing: 1.2px; color: #2f6fb5; margin-bottom: 3px; }
+  .obs p { font-size: 10pt; white-space: pre-line; }
+
+  .assinaturas { display: flex; gap: 40px; margin-top: 60px; }
+  .assinaturas div { flex: 1; text-align: center; border-top: 1px solid #1f2933; padding-top: 5px; font-size: 9.5pt; color: #3e4a57; }
+</style>
+</head>
+<body>
+  <div class="topo">
+    <div class="empresa">
+      {{logo_html}}
+      <div>
+        <h1>{{empresa_nome}}</h1>
+        <p>{{empresa_linha1}}</p>
+        <p>{{empresa_linha2}}</p>
+      </div>
+    </div>
+    <div class="titulo-doc">
+      <div class="rotulo">ORÇAMENTO</div>
+      <div class="numero">Nº {{numero}}</div>
+      <p>Emissão: {{data}}</p>
+      <p>Válido até: {{validade}}</p>
+    </div>
+  </div>
+
+  <div class="blocos">
+    <div class="bloco">
+      <h2>CLIENTE</h2>
+      <div class="nome">{{cliente_nome}}</div>
+      <p>{{cliente_linha1}}</p>
+      <p>{{cliente_linha2}}</p>
+    </div>
+    <div class="bloco">
+      <h2>SERVIÇO</h2>
+      <div class="nome">{{servico_nome}}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>DESCRIÇÃO</th><th class="cen">QTD</th><th class="num">UNITÁRIO</th><th class="num">TOTAL</th></tr>
+    </thead>
+    <tbody>
+      {{itens_html}}
+      <tr class="extra"><td>Mão de obra</td><td class="cen">-</td><td class="num">-</td><td class="num">{{mao_obra}}</td></tr>
+      <tr class="extra"><td>Deslocamento</td><td class="cen">-</td><td class="num">-</td><td class="num">{{deslocamento}}</td></tr>
+      <tr class="total"><td colspan="3">TOTAL</td><td class="num">{{total}}</td></tr>
+    </tbody>
+  </table>
+
+  {{observacoes_html}}
+
+  <div class="assinaturas">
+    <div>{{responsavel}}</div>
+    <div>{{cliente_nome}} — De acordo</div>
+  </div>
+</body>
+</html>
