@@ -1,7 +1,7 @@
 {
   "name": "eletrogestor",
   "productName": "EletroGestor",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Sistema de orçamentos para serviços elétricos",
   "main": "src/main/main.js",
   "author": "EletroGestor",
