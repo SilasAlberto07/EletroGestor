@@ -17,10 +17,10 @@ jobs:
 
     steps:
       - name: Baixar o código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Instalar o Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -28,8 +28,14 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      # O usuário e o nome do repositório vêm do próprio GitHub,
+      # assim não depende do que está escrito no electron-builder.yml
       - name: Gerar instalador e publicar na Release
-        run: npx electron-builder --win --publish always
+        run: >
+          npx electron-builder --win --publish always
+          -c.publish.provider=github
+          -c.publish.owner=${{ github.repository_owner }}
+          -c.publish.repo=${{ github.event.repository.name }}
+          -c.publish.releaseType=release
         env:
-          # Token automático do próprio GitHub, não precisa criar nada
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
