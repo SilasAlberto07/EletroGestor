@@ -55,6 +55,23 @@ body {
   color: #8796a8;
 }
 
+/* Aviso de atualização no menu lateral */
+.sidebar .atualizacao {
+  margin: auto 12px 0;
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--cor-sidebar-ativo);
+  border: 1px solid #3a5270;
+  font-size: 13px;
+  color: #fff;
+}
+.sidebar .atualizacao[hidden] { display: none; }
+.sidebar .atualizacao + .rodape { margin-top: 0; }
+.sidebar .atualizacao-titulo { margin-bottom: 8px; line-height: 1.35; }
+.sidebar .atualizacao .btn { width: 100%; justify-content: center; font-size: 13px; padding: 7px 10px; }
+.atualizacao-barra { height: 6px; background: #1a2633; border-radius: 3px; overflow: hidden; }
+.atualizacao-barra span { display: block; height: 100%; background: var(--cor-primaria); transition: width .3s; }
+
 /* ---------- Conteúdo ---------- */
 .conteudo {
   height: 100vh;

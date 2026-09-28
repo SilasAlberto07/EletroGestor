@@ -39,6 +39,17 @@ contextBridge.exposeInMainWorld('api', {
     escolherLogo: chamar('config:escolherLogo'),
     removerLogo: chamar('config:removerLogo'),
   },
+  atualizacao: {
+    estado: chamar('atualizacao:estado'),
+    verificar: chamar('atualizacao:verificar'),
+    instalar: chamar('atualizacao:instalar'),
+    // Retorna uma função para parar de escutar
+    aoMudar: (callback) => {
+      const ouvinte = (_evento, estado) => callback(estado);
+      ipcRenderer.on('atualizacao', ouvinte);
+      return () => ipcRenderer.removeListener('atualizacao', ouvinte);
+    },
+  },
   // Permite que o menu do topo mude de tela
   aoNavegar: (callback) => ipcRenderer.on('navegar', (_evento, rota) => callback(rota)),
 });

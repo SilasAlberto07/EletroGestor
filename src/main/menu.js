@@ -1,6 +1,7 @@
 // Menu do topo da janela (Arquivo, Exibir, Ajuda)
 const { app, Menu, dialog, BrowserWindow } = require('electron');
 const { fazerBackup } = require('./utils/backup');
+const { verificar } = require('./utils/atualizacao');
 
 function janelaAtual() {
   return BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows()[0];
@@ -50,6 +51,14 @@ function criarMenu() {
     {
       label: 'Ajuda',
       submenu: [
+        {
+          label: 'Verificar atualizações',
+          click: () => {
+            navegar('/configuracoes');
+            verificar();
+          },
+        },
+        { type: 'separator' },
         {
           label: 'Sobre o EletroGestor',
           click: () =>

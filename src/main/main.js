@@ -4,6 +4,7 @@ const { abrirBanco } = require('./database/connection');
 const { registrarModulos } = require('./modules');
 const { criarJanela } = require('./window');
 const { criarMenu } = require('./menu');
+const { iniciarAtualizacao } = require('./utils/atualizacao');
 
 // Impede abrir o programa duas vezes ao mesmo tempo
 if (!app.requestSingleInstanceLock()) {
@@ -22,6 +23,7 @@ if (!app.requestSingleInstanceLock()) {
     registrarModulos();
     criarMenu();
     criarJanela();
+    iniciarAtualizacao();
 
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) criarJanela();

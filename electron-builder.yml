@@ -10,6 +10,14 @@ files:
   - src/**/*
   - package.json
 
+# Atualização automática: as versões novas são publicadas nas "Releases" do GitHub.
+# Troque SEU_USUARIO_GITHUB pelo seu usuário (ou organização) do GitHub.
+publish:
+  provider: github
+  owner: SEU_USUARIO_GITHUB
+  repo: eletrogestor
+  releaseType: release
+
 win:
   target: nsis
   icon: build/icon.png

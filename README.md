@@ -22,6 +22,8 @@ npm run dist
 
 O instalador aparece na pasta `dist/`.
 
+Para publicar uma versão nova no GitHub (os programas instalados atualizam sozinhos): `npm run publicar`. Veja [`docs/ATUALIZACOES.md`](docs/ATUALIZACOES.md).
+
 ## Funcionalidades
 
 - **Início (Dashboard):** cards de resumo, orçamentos recentes e criação rápida de orçamento
@@ -29,6 +31,7 @@ O instalador aparece na pasta `dist/`.
 - **Clientes, Serviços e Materiais:** cadastro completo com busca
 - **Configurações:** logo da empresa (vai para o PDF), dados da empresa, deslocamento padrão, validade, condições, backup e restauração
 - **PDF:** gerado pelo próprio Electron, salvo em `Documentos/EletroGestor/Orcamentos`
+- **Atualização automática:** pelo GitHub Releases. Veja o passo a passo em [`docs/ATUALIZACOES.md`](docs/ATUALIZACOES.md)
 
 Na primeira vez que abre, o sistema cria dados de exemplo (5 clientes, 5 orçamentos). Pode excluí-los pelo próprio sistema.
 
@@ -62,7 +65,7 @@ src/
 │   │   ├── servicos/
 │   │   ├── materiais/
 │   │   └── configuracoes/
-│   └── utils/                paths.js, backup.js
+│   └── utils/                paths.js, backup.js, atualizacao.js
 │
 ├── preload/
 │   └── preload.js            Ponte segura: tudo que a tela pode chamar (window.api)

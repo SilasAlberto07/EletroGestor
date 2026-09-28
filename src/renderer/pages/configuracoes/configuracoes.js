@@ -1,6 +1,7 @@
 // Configurações: dados da empresa, valores padrão e backup
 import { avisar, avisarErro } from '../../components/toast.js';
 import { icones, logo as logoPadrao } from '../../components/icons.js';
+import { textoEstado, instalarAtualizacao } from '../../components/avisoAtualizacao.js';
 import { esc } from '../../js/utils/dom.js';
 import { formatarDecimal, lerNumero } from '../../js/utils/moeda.js';
 
@@ -69,7 +70,18 @@ export async function render(raiz) {
           <button type="button" class="btn btn-contorno" data-acao="restaurar">Restaurar backup</button>
           <button type="button" class="btn btn-contorno" data-acao="pasta">Abrir pasta dos dados</button>
         </div>
-        <p class="info-linha" style="margin:14px 0 0">EletroGestor versão ${esc(info.versao)}</p>
+      </section>
+
+      <section class="painel">
+        <div class="painel-cabecalho"><h2>Atualizações</h2></div>
+        <p class="info-linha" style="margin:0 0 12px">
+          Versão instalada: <strong>${esc(info.versao)}</strong>. O sistema procura atualizações sozinho ao abrir.
+        </p>
+        <div class="botoes-linha">
+          <button type="button" class="btn btn-contorno" data-acao="verificar-atualizacao">Verificar atualizações</button>
+          <button type="button" class="btn btn-primario" data-acao="instalar-atualizacao" hidden>Reiniciar e atualizar</button>
+        </div>
+        <p class="info-linha estado-atualizacao" style="margin:12px 0 0"></p>
       </section>
     </div>`;
 
@@ -81,6 +93,17 @@ export async function render(raiz) {
     raiz.querySelector('[data-acao=remover-logo]').hidden = !logo;
   }
   mostrarLogo(config.logo);
+
+  // ---------- Atualizações ----------
+  function mostrarAtualizacao(e) {
+    if (!raiz.isConnected) return pararDeOuvir?.(); // saiu da página
+    const texto = raiz.querySelector('.estado-atualizacao');
+    texto.textContent = textoEstado(e);
+    raiz.querySelector('[data-acao=instalar-atualizacao]').hidden = e.estado !== 'pronta';
+    raiz.querySelector('[data-acao=verificar-atualizacao]').disabled = ['verificando', 'baixando'].includes(e.estado);
+  }
+  const pararDeOuvir = window.api.atualizacao.aoMudar(mostrarAtualizacao);
+  mostrarAtualizacao(await window.api.atualizacao.estado());
 
   raiz.querySelector('.form-config').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -101,6 +124,8 @@ export async function render(raiz) {
   raiz.addEventListener('click', async (e) => {
     const acao = e.target.closest('[data-acao]')?.dataset.acao;
     try {
+      if (acao === 'verificar-atualizacao') mostrarAtualizacao(await window.api.atualizacao.verificar());
+      if (acao === 'instalar-atualizacao') await instalarAtualizacao();
       if (acao === 'trocar-logo') {
         const logo = await window.api.config.escolherLogo();
         if (logo) {
