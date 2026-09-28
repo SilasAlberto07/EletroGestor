@@ -22,7 +22,7 @@ npm run dist
 
 O instalador aparece na pasta `dist/`.
 
-Para publicar uma versão nova no GitHub (os programas instalados atualizam sozinhos): `npm run publicar`. Veja [`docs/ATUALIZACOES.md`](docs/ATUALIZACOES.md).
+Para lançar uma versão nova (o GitHub gera o instalador e os programas instalados atualizam sozinhos): `npm run lancar`. Veja [`docs/ATUALIZACOES.md`](docs/ATUALIZACOES.md).
 
 ## Funcionalidades
 

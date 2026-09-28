@@ -48,41 +48,57 @@ git push -u origin main
 
 O `.gitignore` já impede que `node_modules` e `dist` sejam enviados.
 
-### 4. Criar o token de publicação
+### 4. Permitir que o GitHub publique
 
-O token é a "senha" que permite ao seu computador publicar versões no GitHub.
+No repositório: **Settings** → **Actions** → **General** → em **Workflow permissions**, marque **Read and write permissions** e clique em **Save**.
 
-1. GitHub → foto do perfil → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)** → **Generate new token (classic)**.
-2. Nome: `eletrogestor-publicar`. Marque a permissão **repo**.
-3. Copie o token (começa com `ghp_`). Ele só aparece uma vez.
-
-**Nunca coloque o token dentro do código nem envie para o GitHub.** Ele é usado só no terminal, na hora de publicar.
+Não precisa criar token: o GitHub usa um token automático próprio para publicar.
 
 ---
 
 ## Publicar uma versão nova (toda vez)
 
-1. Faça as alterações no sistema e teste com `npm start`.
-2. No `package.json`, aumente a versão. Exemplo: `"version": "1.0.0"` → `"version": "1.0.1"`.
-   - Correção pequena: 1.0.**1**
-   - Função nova: 1.**1**.0
-   - Mudança grande: **2**.0.0
-3. No **PowerShell**, dentro da pasta do projeto:
+1. Faça as alterações e teste com `npm start`.
+2. Salve as alterações no Git:
+
+```bash
+git add .
+git commit -m "O que mudou nesta versão"
+```
+
+3. Lance a versão com **um** destes comandos:
+
+| Comando | Quando usar | Exemplo |
+|---|---|---|
+| `npm run lancar` | Correção pequena | 1.0.0 → 1.0.**1** |
+| `npm run lancar:funcao` | Função nova | 1.0.1 → 1.**1**.0 |
+| `npm run lancar:grande` | Mudança grande | 1.1.0 → **2**.0.0 |
+
+O comando faz tudo sozinho:
+- aumenta a versão no `package.json`;
+- cria o commit "Versão 1.0.1" e a tag `v1.0.1`;
+- envia para o GitHub.
+
+4. Ao receber a tag, o GitHub gera o instalador no Windows e publica a Release (leva uns 5 a 10 minutos). Acompanhe na aba **Actions** do repositório: bolinha amarela = gerando, verde = publicado, vermelha = erro.
+
+5. Pronto! Os computadores com o EletroGestor instalado recebem a atualização sozinhos.
+
+> O `npm run lancar` só funciona se não houver alterações sem commit. Se aparecer o erro "Git working directory not clean", faça o passo 2 antes.
+
+### A primeira instalação
+
+Rode `npm run lancar` uma vez para gerar a primeira Release. Depois baixe o instalador `EletroGestor-Setup-x.x.x.exe` na página **Releases** do repositório e instale normalmente. Daí em diante, as atualizações chegam sozinhas.
+
+### Publicar pelo seu computador (alternativa)
+
+Se preferir gerar o instalador na sua máquina em vez do GitHub, crie um token (GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic), permissão **repo**), aumente a versão no `package.json` e rode no PowerShell:
 
 ```powershell
 $env:GH_TOKEN="ghp_seu_token_aqui"
 npm run publicar
 ```
 
-(No **Prompt de Comando (cmd)**, use `set GH_TOKEN=ghp_seu_token_aqui` no lugar da primeira linha.)
-
-4. Pronto! O comando gera o instalador e publica em **Releases** no GitHub. Os computadores com o EletroGestor instalado vão receber a atualização sozinhos.
-
-5. Salve o código também: `git add .`, `git commit -m "Versão 1.0.1"` e `git push`.
-
-### A primeira instalação
-
-Na primeira vez, baixe o instalador `EletroGestor-Setup-1.0.0.exe` na página **Releases** do seu repositório e instale normalmente. Daí em diante, as atualizações chegam sozinhas.
+**Nunca coloque o token dentro de arquivos do projeto.**
 
 ---
 
@@ -103,5 +119,7 @@ Se quiser manter o código fechado, a solução é ter **dois repositórios**:
 |---|---|
 | "Nenhuma versão publicada encontrada no GitHub" | Ainda não rodou `npm run publicar`, ou o usuário/repositório no `electron-builder.yml` está errado. |
 | "Sem conexão com a internet" | O computador está offline. Ele tenta de novo depois. |
-| Erro 401 ao publicar | Token errado ou sem a permissão **repo**. |
+| Erro 401 ao publicar | Token errado ou sem a permissão **repo** (só na publicação pelo computador). |
+| Erro 403 na aba Actions | Faltou marcar **Read and write permissions** (passo 4 da configuração). |
+| "Git working directory not clean" | Faça `git add .` e `git commit` antes do `npm run lancar`. |
 | Atualização não aparece | Confira se a versão no `package.json` é **maior** que a instalada. |
