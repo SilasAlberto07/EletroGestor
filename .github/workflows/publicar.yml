@@ -29,13 +29,15 @@ jobs:
         run: npm ci
 
       # O usuário e o nome do repositório vêm do próprio GitHub,
-      # assim não depende do que está escrito no electron-builder.yml
+      # assim não depende do que está escrito no electron-builder.yml.
+      # "shell: bash" é necessário: o PowerShell quebra os argumentos "-c.publish...".
       - name: Gerar instalador e publicar na Release
+        shell: bash
         run: >
           npx electron-builder --win --publish always
-          -c.publish.provider=github
-          -c.publish.owner=${{ github.repository_owner }}
-          -c.publish.repo=${{ github.event.repository.name }}
-          -c.publish.releaseType=release
+          "-c.publish.provider=github"
+          "-c.publish.owner=${{ github.repository_owner }}"
+          "-c.publish.repo=${{ github.event.repository.name }}"
+          "-c.publish.releaseType=release"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
