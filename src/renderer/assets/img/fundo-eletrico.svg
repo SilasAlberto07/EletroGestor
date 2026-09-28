@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="pontos" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="16" cy="16" r="1.2" fill="#d6dde6"/>
+    </pattern>
+    <radialGradient id="brilho" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#3a86d4" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#3a86d4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#eceff3"/>
+  <rect width="1920" height="1080" fill="url(#pontos)"/>
+
+  <!-- Ondas de corrente alternada -->
+  <path d="M0 880 Q120 800 240 880 T480 880 T720 880 T960 880 T1200 880 T1440 880 T1680 880 T1920 880" fill="none" stroke="#3a86d4" stroke-width="2" stroke-opacity="0.3"/>
+  <path d="M-120 880 Q0 800 120 880 T360 880 T600 880 T840 880 T1080 880 T1320 880 T1560 880 T1800 880 T2040 880" fill="none" stroke="#e9a23b" stroke-width="1.5" stroke-opacity="0.28"/>
+  <path d="M0 880 H1920" stroke="#c9d2dd" stroke-width="1" stroke-dasharray="4 8"/>
+
+  <!-- Circuito: canto superior direito -->
+  <g fill="none" stroke="#c9d2dd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1920 120 H1660 L1600 180 H1440"/>
+    <path d="M1920 200 H1720 L1660 260 V380 H1560"/>
+    <path d="M1920 300 H1780 L1740 340 V480"/>
+    <path d="M1500 0 V70 L1560 130 H1620"/>
+    <path d="M1700 0 V60 L1740 100 H1920"/>
+    <path d="M1920 420 H1840 L1800 460 V560 H1700"/>
+  </g>
+  <path d="M1920 200 H1720 L1660 260 V380 H1560" fill="none" stroke="#3a86d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.7"/>
+  <g fill="#eceff3" stroke="#c9d2dd" stroke-width="2">
+    <circle cx="1440" cy="180" r="6"/>
+    <circle cx="1740" cy="480" r="6"/>
+    <circle cx="1620" cy="130" r="6"/>
+    <circle cx="1700" cy="560" r="6"/>
+  </g>
+  <circle cx="1560" cy="380" r="40" fill="url(#brilho)"/>
+  <circle cx="1560" cy="380" r="7" fill="#3a86d4"/>
+
+  <!-- Circuito: canto inferior esquerdo -->
+  <g fill="none" stroke="#c9d2dd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 960 H260 L320 900 H480"/>
+    <path d="M0 800 H200 L260 740 V640 H360"/>
+    <path d="M0 700 H140 L180 660 V560"/>
+    <path d="M420 1080 V1010 L360 950 H300"/>
+    <path d="M220 1080 V1030 L180 990 H0"/>
+    <path d="M0 600 H80 L120 560 V460 H220"/>
+  </g>
+  <path d="M0 960 H260 L320 900 H480" fill="none" stroke="#e9a23b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.8"/>
+  <g fill="#eceff3" stroke="#c9d2dd" stroke-width="2">
+    <circle cx="360" cy="640" r="6"/>
+    <circle cx="180" cy="560" r="6"/>
+    <circle cx="300" cy="950" r="6"/>
+    <circle cx="220" cy="460" r="6"/>
+  </g>
+  <circle cx="480" cy="900" r="7" fill="#e9a23b"/>
+
+  <!-- Raio -->
+  <path d="M1812 752 L1772 832 H1800 L1780 896 L1836 806 H1806 L1828 752 Z" fill="none" stroke="#e9a23b" stroke-width="2" stroke-linejoin="round" stroke-opacity="0.65"/>
+</svg>
