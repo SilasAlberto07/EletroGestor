@@ -10,7 +10,7 @@ import { formatarMoedaCurta } from '../../js/utils/moeda.js';
 export async function render(raiz) {
   raiz.innerHTML = `
     <div class="pagina">
-      <div class="pagina-topo"><h1>Dashboard</h1></div>
+      <div class="pagina-topo"><h1>Painel de Controle</h1></div>
       <div class="cards"></div>
       <section class="painel">
         <div class="painel-cabecalho">
