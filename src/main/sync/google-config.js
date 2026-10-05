@@ -4,10 +4,10 @@
 // depende sempre do login do próprio usuário.
 module.exports = {
   // Cliente "App para computador"
-  desktopClientId: 'PREENCHER.apps.googleusercontent.com',
-  desktopClientSecret: 'PREENCHER',
+  desktopClientId: '362696230212-g093b9bbrfjvglp8jgdm7rsle614gn1m.apps.googleusercontent.com',
+  desktopClientSecret: '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',
   // Cliente "Aplicativo da Web" (usado pelo login do Android)
-  webClientId: 'PREENCHER.apps.googleusercontent.com',
+  webClientId: '362696230212-84f1vqtv0du7k38hoo65aoeg5fo878n1.apps.googleusercontent.com',
   // Só pede acesso aos arquivos que o próprio EletroGestor criar no Drive
   escopos: ['openid', 'email', 'https://www.googleapis.com/auth/drive.file'],
 };
