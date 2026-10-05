@@ -51,6 +51,22 @@ contextBridge.exposeInMainWorld('api', {
       return () => ipcRenderer.removeListener('atualizacao', ouvinte);
     },
   },
+  // Sincronização com o Google Drive
+  sync: {
+    estado: chamar('sync:estado'),
+    entrar: chamar('sync:entrar'),
+    sair: chamar('sync:sair'),
+    sincronizar: chamar('sync:sincronizar'),
+    resolverConflito: chamar('sync:resolverConflito'),
+    // Retorna uma função para parar de escutar
+    aoMudar: (callback) => {
+      const ouvinte = (_evento, estado) => callback(estado);
+      ipcRenderer.on('sync', ouvinte);
+      return () => ipcRenderer.removeListener('sync', ouvinte);
+    },
+    // Os dados foram atualizados com a versão do Drive (outro aparelho mudou algo)
+    aoBaixar: (callback) => ipcRenderer.on('sync:dados', () => callback()),
+  },
   // Permite que o menu do topo mude de tela
   aoNavegar: (callback) => ipcRenderer.on('navegar', (_evento, rota) => callback(rota)),
 });

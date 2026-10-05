@@ -8,6 +8,7 @@ const { caminhoBanco } = require('../utils/paths');
 let SQL = null;
 let db = null;
 let emTransacao = false;
+let aoAlterar = null; // avisado a cada alteração gravada (usado pela sincronização com o Drive)
 
 async function abrirBanco() {
   const wasm = fs.readFileSync(require.resolve('sql.js/dist/sql-wasm.wasm'));
@@ -33,6 +34,11 @@ function salvarArquivo() {
   const temporario = `${arquivo}.tmp`;
   fs.writeFileSync(temporario, Buffer.from(dados));
   fs.renameSync(temporario, arquivo); // grava de forma segura
+  if (aoAlterar) aoAlterar();
+}
+
+function definirAoAlterar(funcao) {
+  aoAlterar = funcao;
 }
 
 function limparParametros(parametros) {
@@ -141,4 +147,4 @@ function substituirBanco(buffer) {
   rodarMigrations();
 }
 
-module.exports = { abrirBanco, todos, um, executar, transacao, exportarBanco, substituirBanco };
+module.exports = { abrirBanco, todos, um, executar, transacao, exportarBanco, substituirBanco, definirAoAlterar };

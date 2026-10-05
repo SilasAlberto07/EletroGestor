@@ -92,3 +92,14 @@ body {
   min-height: 44px;
 }
 .pagina-topo .voltar { font-size: 13px; display: inline-block; margin-bottom: 2px; }
+
+/* Sincronização com o Google Drive (menu lateral) */
+.sidebar .sync-menu { margin: auto 12px 0; font-size: 12.5px; }
+.sidebar .sync-menu[hidden] { display: none; }
+.sidebar .sync-menu:not([hidden]) ~ .rodape { margin-top: 0; }
+.sidebar .sync-menu:not([hidden]) ~ .atualizacao { margin-top: 8px; }
+.sidebar .sync-menu a { display: flex; align-items: center; gap: 7px; color: #b9c5d2; padding: 6px 6px; border-radius: 4px; text-decoration: none; }
+.sidebar .sync-menu a:hover { background: var(--cor-sidebar-hover); }
+.sidebar .sync-menu .sync-conflito { background: var(--cor-sidebar-ativo); border: 1px solid #b3772a; border-radius: 6px; padding: 10px; color: #fff; }
+.sidebar .sync-menu .sync-conflito p { margin: 0 0 8px; line-height: 1.35; }
+.sidebar .sync-menu .sync-conflito .btn { width: 100%; justify-content: center; font-size: 12.5px; padding: 6px 8px; margin-top: 6px; white-space: normal; }

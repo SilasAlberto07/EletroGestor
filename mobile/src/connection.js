@@ -9,6 +9,7 @@ import { lerBanco, gravarBanco } from './armazenamento.js';
 let SQL = null;
 let db = null;
 let emTransacao = false;
+let aoAlterar = null; // avisado a cada alteração (usado pela sincronização com o Drive)
 
 export async function abrirBanco() {
   SQL = await initSqlJs({ locateFile: () => 'sql-wasm.wasm' });
@@ -27,6 +28,11 @@ function salvarArquivo() {
   const dados = db.export(); // o export reinicia as configurações do banco
   configurar();
   gravarBanco(dados);
+  if (aoAlterar) aoAlterar();
+}
+
+export function definirAoAlterar(funcao) {
+  aoAlterar = funcao;
 }
 
 function limparParametros(parametros) {

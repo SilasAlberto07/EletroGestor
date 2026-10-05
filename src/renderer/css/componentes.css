@@ -225,3 +225,16 @@
 .carregando { color: var(--cor-texto-fraco); padding: 30px; text-align: center; }
 .info-linha { font-size: 13px; color: var(--cor-texto-suave); word-break: break-all; }
 .botoes-linha { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Sincronização com o Google Drive ---------- */
+.sync-bolinha { width: 9px; height: 9px; border-radius: 50%; background: var(--cor-texto-fraco); flex: none; display: inline-block; }
+.situacao-ok .sync-bolinha { background: var(--cor-aprovado); }
+.situacao-sincronizando .sync-bolinha, .situacao-pendente .sync-bolinha { background: var(--cor-primaria); animation: piscar 1s infinite alternate; }
+.situacao-offline .sync-bolinha, .situacao-login .sync-bolinha, .situacao-conflito .sync-bolinha { background: var(--cor-aguardando); }
+.situacao-erro .sync-bolinha { background: var(--cor-recusado); }
+@keyframes piscar { from { opacity: 1; } to { opacity: .35; } }
+.sync-status { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 14px; flex-wrap: wrap; }
+.painel-sync .sync-conflito { border: 1px solid var(--cor-aguardando); background: #fff8ec; border-radius: var(--raio); padding: 12px; margin-bottom: 12px; }
+.painel-sync .sync-conflito p { margin: 0 0 10px; }
+.painel-sync .sync-conflito .btn { margin: 0 8px 6px 0; }
+.painel-sync .info-linha { word-break: normal; }

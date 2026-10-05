@@ -24,6 +24,43 @@ rodar('npx cap sync android');
 // Ícone e tela de abertura
 fs.cpSync(path.join(MOBILE, 'recursos-android', 'res'), path.join(ANDROID, 'app', 'src', 'main', 'res'), { recursive: true });
 
+// Tela principal do Android: o login do Google (plugin SocialLogin) precisa receber
+// a resposta da janela de permissão do Drive. Ver README do @capgo/capacitor-social-login.
+const mainActivity = path.join(ANDROID, 'app', 'src', 'main', 'java', 'br', 'com', 'eletrogestor', 'app', 'MainActivity.java');
+fs.writeFileSync(
+  mainActivity,
+  `package br.com.eletrogestor.app;
+
+import android.content.Intent;
+import com.getcapacitor.BridgeActivity;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginHandle;
+import ee.forgr.capacitor.social.login.GoogleProvider;
+import ee.forgr.capacitor.social.login.ModifiedMainActivityForSocialLoginPlugin;
+import ee.forgr.capacitor.social.login.SocialLoginPlugin;
+
+// Gerado por mobile/scripts/preparar-android.mjs (não edite aqui)
+public class MainActivity extends BridgeActivity implements ModifiedMainActivityForSocialLoginPlugin {
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode >= GoogleProvider.REQUEST_AUTHORIZE_GOOGLE_MIN && requestCode < GoogleProvider.REQUEST_AUTHORIZE_GOOGLE_MAX) {
+            PluginHandle handle = getBridge().getPlugin("SocialLogin");
+            if (handle == null) return;
+            Plugin plugin = handle.getInstance();
+            if (plugin instanceof SocialLoginPlugin) {
+                ((SocialLoginPlugin) plugin).handleGoogleLoginIntent(requestCode, data);
+            }
+        }
+    }
+
+    @Override
+    public void IHaveModifiedTheMainActivityForTheUseWithSocialLoginPlugin() {}
+}
+`
+);
+
 // Versão: 1.2.3 -> versionName "1.2.3" e versionCode 10203 (precisa sempre aumentar)
 const versao = JSON.parse(fs.readFileSync(path.join(RAIZ, 'package.json'), 'utf8')).version;
 const [maior, menor, correcao] = versao.split('.').map((n) => parseInt(n, 10) || 0);

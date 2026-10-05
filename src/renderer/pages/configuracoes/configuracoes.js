@@ -2,6 +2,8 @@
 import { avisar, avisarErro } from '../../components/toast.js';
 import { icones, logo as logoPadrao } from '../../components/icons.js';
 import { textoEstado, instalarAtualizacao } from '../../components/avisoAtualizacao.js';
+import { textoSincronizacao, resolverConflito, htmlConflito } from '../../components/avisoSincronizacao.js';
+import { confirmar } from '../../components/modal.js';
 import { esc } from '../../js/utils/dom.js';
 import { formatarDecimal, lerNumero } from '../../js/utils/moeda.js';
 
@@ -59,6 +61,15 @@ export async function render(raiz) {
         </div>
       </form>
 
+      <section class="painel painel-sync">
+        <div class="painel-cabecalho"><h2>Sincronização com o Google Drive</h2></div>
+        <p class="info-linha" style="margin:0 0 12px">
+          Mantém os mesmos dados no celular e no computador. Entre com a <strong>mesma conta Google</strong> nos dois aparelhos.
+          O EletroGestor só acessa o arquivo que ele mesmo cria no seu Drive.
+        </p>
+        <div class="sync-detalhe"></div>
+      </section>
+
       <section class="painel">
         <div class="painel-cabecalho"><h2>Backup dos dados</h2></div>
         <p class="info-linha" style="margin:0 0 12px">
@@ -105,6 +116,33 @@ export async function render(raiz) {
   const pararDeOuvir = window.api.atualizacao.aoMudar(mostrarAtualizacao);
   mostrarAtualizacao(await window.api.atualizacao.estado());
 
+  // ---------- Sincronização ----------
+  function mostrarSincronizacao(e) {
+    if (!raiz.isConnected) return pararSync?.();
+    const caixa = raiz.querySelector('.sync-detalhe');
+    if (!e.conectado) {
+      caixa.innerHTML = `
+        <div class="botoes-linha">
+          <button type="button" class="btn btn-primario" data-acao="sync-entrar">Entrar com Google</button>
+        </div>
+        ${e.mensagem ? `<p class="info-linha" style="margin:10px 0 0">${esc(e.mensagem)}</p>` : ''}`;
+      return;
+    }
+    caixa.innerHTML = `
+      <p class="sync-status situacao-${esc(e.situacao)}"><span class="sync-bolinha"></span>
+        <strong>${esc(textoSincronizacao(e))}</strong> &nbsp;·&nbsp; conta: ${esc(e.email || 'Google')}</p>
+      ${e.mensagem && e.situacao !== 'conflito' ? `<p class="info-linha" style="margin:0 0 10px">${esc(e.mensagem)}</p>` : ''}
+      ${e.situacao === 'conflito' ? htmlConflito() : ''}
+      <div class="botoes-linha">
+        ${e.situacao === 'login' ? '<button type="button" class="btn btn-primario" data-acao="sync-entrar">Entrar novamente</button>' : ''}
+        <button type="button" class="btn btn-contorno" data-acao="sync-agora" ${e.situacao === 'sincronizando' ? 'disabled' : ''}>Sincronizar agora</button>
+        <button type="button" class="btn btn-contorno" data-acao="sync-sair">Desconectar</button>
+      </div>`;
+  }
+  const pararSync = window.api.sync?.aoMudar(mostrarSincronizacao);
+  if (window.api.sync) mostrarSincronizacao(await window.api.sync.estado());
+  else raiz.querySelector('.painel-sync').hidden = true;
+
   raiz.querySelector('.form-config').addEventListener('submit', async (e) => {
     e.preventDefault();
     const botao = e.target.querySelector('[type=submit]');
@@ -146,8 +184,24 @@ export async function render(raiz) {
         if (await window.api.config.restaurar()) location.reload(); // recarrega com os dados restaurados
       }
       if (acao === 'pasta') await window.api.config.abrirPastaDados();
+      if (acao === 'sync-entrar') {
+        e.target.closest('button').disabled = true;
+        avisar('Conclua o login do Google na janela que abriu.');
+        const estado = await window.api.sync.entrar();
+        mostrarSincronizacao(estado);
+        if (estado.conectado) avisar('Conectado ao Google Drive.');
+      }
+      if (acao === 'sync-agora') mostrarSincronizacao(await window.api.sync.sincronizar());
+      if (acao === 'sync-sair') {
+        if (await confirmar('Este aparelho vai parar de sincronizar com o Google Drive. Os dados continuam salvos aqui e no Drive.', { titulo: 'Desconectar', textoConfirmar: 'Desconectar', perigo: false })) {
+          mostrarSincronizacao(await window.api.sync.sair());
+        }
+      }
+      const conflito = e.target.closest('.painel-sync [data-sync]');
+      if (conflito) await resolverConflito(conflito.dataset.sync);
     } catch (err) {
       avisarErro(err);
+      if (acao?.startsWith('sync-') && window.api.sync) mostrarSincronizacao(await window.api.sync.estado());
     }
   });
 }

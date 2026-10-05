@@ -1,0 +1,10 @@
+body{font-family:"Segoe UI",Roboto,Arial,sans-serif;margin:0;background:#eceff3;color:#1f2933;line-height:1.6}
+header{background:#1f2d3d;color:#fff;padding:22px 20px}
+header .c{display:flex;align-items:center;gap:12px;max-width:760px;margin:0 auto}
+header img{width:44px;height:44px;border-radius:9px}
+header h1{font-size:24px;margin:0;font-weight:600}
+main{max-width:760px;margin:24px auto;background:#fff;border-radius:8px;padding:28px 32px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+h2{color:#2c6fb4;font-size:19px;margin-top:28px}
+a{color:#2c6fb4}
+footer{text-align:center;color:#5f6b7a;font-size:13px;padding:10px 20px 30px}
+@media(max-width:600px){main{margin:12px;padding:20px}}

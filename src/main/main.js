@@ -5,6 +5,7 @@ const { registrarModulos } = require('./modules');
 const { criarJanela } = require('./window');
 const { criarMenu } = require('./menu');
 const { iniciarAtualizacao } = require('./utils/atualizacao');
+const { registrarSincronizacao, iniciarSincronizacao } = require('./sync/sync-desktop');
 
 // Impede abrir o programa duas vezes ao mesmo tempo
 if (!app.requestSingleInstanceLock()) {
@@ -21,9 +22,11 @@ if (!app.requestSingleInstanceLock()) {
   app.whenReady().then(async () => {
     await abrirBanco();
     registrarModulos();
+    registrarSincronizacao();
     criarMenu();
     criarJanela();
     iniciarAtualizacao();
+    iniciarSincronizacao();
 
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) criarJanela();

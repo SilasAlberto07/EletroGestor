@@ -19,6 +19,7 @@ export function montarSidebar(elemento) {
         .map((i) => `<a href="#${i.rota}" data-menu="${i.chave}">${icones[i.icone]}<span>${i.nome}</span></a>`)
         .join('')}
     </nav>
+    <div class="sync-menu" hidden></div>
     <div class="atualizacao" hidden></div>
     <div class="rodape">EletroGestor v1.0</div>`;
 }

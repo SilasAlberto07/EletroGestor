@@ -16,6 +16,7 @@ import { escolherLogo, removerLogo } from './logo.js';
 import { compartilharArquivo, escolherArquivo, dataHoje } from './arquivos.js';
 import * as atualizacao from './atualizacao.js';
 import { iniciarInterfaceCelular } from './ui.js';
+import { iniciarSincronizacao } from './sync-celular.js';
 
 /* global __VERSAO__ */
 const VERSAO = __VERSAO__;
@@ -90,6 +91,7 @@ window.api = {
     instalar: async () => atualizacao.instalar(),
     aoMudar: (callback) => atualizacao.aoMudar(callback),
   },
+  sync: iniciarSincronizacao(pronto),
   aoNavegar: () => {},
 };
 

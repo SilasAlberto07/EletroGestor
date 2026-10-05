@@ -101,3 +101,23 @@ desinstalar (e perder os dados do celular). Por isso:
 - Guarde uma cópia da pasta `mobile/assinatura` em lugar seguro.
 - Ela **não vai para o GitHub** (está no `.gitignore`), porque quem tiver a chave pode
   assinar apps em seu nome.
+
+---
+
+## Sincronização com o Google Drive (celular ⇄ computador)
+
+Em **Configurações → Sincronização com o Google Drive → Entrar com Google**, nos dois aparelhos,
+com a **mesma conta Google**. A partir daí:
+
+- Ao abrir o app (ou voltar para ele), se o outro aparelho mudou algo, os dados são baixados.
+- Ao salvar qualquer coisa, os dados são enviados para o Drive (uns 3 segundos depois).
+- Sem internet funciona normal; envia quando a conexão voltar.
+- Se os dois aparelhos mudarem dados sem sincronizar no meio (ex.: os dois sem internet), o app
+  **não apaga nada sozinho**: pergunta qual versão manter.
+
+O arquivo fica no Drive com o nome `EletroGestor - dados (não apague).db`. O app só tem acesso a
+esse arquivo (permissão `drive.file`), nada mais do Drive.
+
+Os códigos do Google Cloud ficam em `src/main/sync/google-config.js`. O login do Android só funciona
+no APK assinado com a chave da pasta `mobile/assinatura` (a impressão SHA-1 dela está cadastrada no
+Google Cloud, no cliente "EletroGestor Android").

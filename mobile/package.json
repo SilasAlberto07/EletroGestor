@@ -16,6 +16,7 @@
     "@capacitor/core": "^8.5.2",
     "@capacitor/filesystem": "^8.1.4",
     "@capacitor/share": "^8.0.3",
+    "@capgo/capacitor-social-login": "^8.5.12",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
     "sql.js": "^1.14.2"
