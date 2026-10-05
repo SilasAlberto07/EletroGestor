@@ -1,0 +1,97 @@
+# Publica uma versão nova do EletroGestor automaticamente.
+# Dispara quando chega uma tag do tipo v1.0.1 (criada pelo comando "npm run lancar").
+# O GitHub gera o instalador .exe no Windows e publica nas Releases.
+name: Publicar versão
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write # necessário para criar a Release
+
+jobs:
+  publicar:
+    runs-on: windows-latest
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # O usuário e o nome do repositório vêm do próprio GitHub,
+      # assim não depende do que está escrito no electron-builder.yml.
+      # "shell: bash" é necessário: o PowerShell quebra os argumentos "-c.publish...".
+      - name: Gerar instalador e publicar na Release
+        shell: bash
+        run: >
+          npx electron-builder --win --publish always
+          "-c.publish.provider=github"
+          "-c.publish.owner=${{ github.repository_owner }}"
+          "-c.publish.repo=${{ github.event.repository.name }}"
+          "-c.publish.releaseType=release"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Gera o APK do Android e coloca na mesma Release (depois que o instalador do Windows foi publicado).
+  # Precisa de 2 segredos no GitHub (Settings > Secrets and variables > Actions):
+  #   ANDROID_KEYSTORE_BASE64 = conteúdo do arquivo mobile/assinatura/eletrogestor.jks.base64.txt
+  #   ANDROID_KEYSTORE_SENHA  = a senha que está em mobile/assinatura/assinatura.properties
+  android:
+    needs: publicar
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Instalar o Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Instalar o Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar dependências do app Android
+        working-directory: mobile
+        run: npm ci
+
+      - name: Preparar a assinatura do APK
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then
+            echo "::error::Falta o segredo ANDROID_KEYSTORE_BASE64 no GitHub. Veja mobile/COMO-GERAR-APK.md"
+            exit 1
+          fi
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/eletrogestor.jks"
+          echo "ELETRO_KEYSTORE=$RUNNER_TEMP/eletrogestor.jks" >> "$GITHUB_ENV"
+
+      - name: Gerar o APK
+        working-directory: mobile
+        env:
+          ELETRO_SENHA: ${{ secrets.ANDROID_KEYSTORE_SENHA }}
+        run: npm run apk
+
+      - name: Colocar o APK na Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.ref_name }}" mobile/apk/*.apk --clobber

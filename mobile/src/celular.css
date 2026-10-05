@@ -1,0 +1,192 @@
+/* Ajustes de tela para o celular (carregado só no app Android, depois dos estilos do computador) */
+
+:root {
+  --topo-seguro: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --baixo-seguro: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --altura-barra: 54px;
+}
+
+html, body { overscroll-behavior: none; }
+body.celular {
+  display: block;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Campos com fonte 16px: o Android não dá zoom ao tocar */
+body.celular input, body.celular select, body.celular textarea { font-size: 16px; }
+body.celular .btn { padding: 10px 16px; font-size: 15px; }
+
+/* ---------- Barra do topo ---------- */
+.barra-celular {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: calc(var(--altura-barra) + var(--topo-seguro));
+  padding: var(--topo-seguro) 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cor-sidebar);
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+}
+.barra-celular .botao-menu {
+  background: none;
+  border: 0;
+  color: #fff;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.barra-celular .botao-menu:active { background: rgba(255, 255, 255, .12); }
+.barra-celular .botao-menu svg { width: 26px; height: 26px; }
+.barra-celular .barra-titulo { font-size: 19px; font-weight: 600; }
+
+/* ---------- Menu lateral (abre por cima) ---------- */
+body.celular .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(280px, 82vw);
+  height: auto;
+  z-index: 40;
+  padding-top: var(--topo-seguro);
+  padding-bottom: var(--baixo-seguro);
+  transform: translateX(-105%);
+  transition: transform .22s ease-out;
+  overflow-y: auto;
+}
+body.celular.menu-aberto .sidebar { transform: none; box-shadow: 4px 0 20px rgba(0, 0, 0, .3); }
+body.celular .sidebar nav a { padding: 14px 20px; font-size: 17px; }
+
+.menu-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: rgba(10, 16, 24, .45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+body.menu-aberto .menu-fundo { opacity: 1; pointer-events: auto; }
+
+/* ---------- Conteúdo ---------- */
+body.celular .conteudo {
+  height: 100vh;
+  height: 100dvh;
+  padding: calc(var(--altura-barra) + var(--topo-seguro) + 12px) 10px calc(24px + var(--baixo-seguro));
+  background-attachment: scroll;
+}
+body.celular h1 { font-size: 22px; }
+body.celular h2 { font-size: 18px; }
+body.celular .pagina { gap: 12px; }
+body.celular .pagina-topo { flex-wrap: wrap; }
+body.celular .painel { padding: 12px 10px; }
+
+/* Cards do painel: 2 por linha */
+body.celular .cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+body.celular .card .card-titulo { font-size: 14px; }
+body.celular .card .card-valor { font-size: 26px; }
+
+/* Listas (clientes, orçamentos...): rolam para o lado se não couberem */
+body.celular .lista, body.celular .recentes { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+body.celular .tabela th { font-size: 14px; white-space: nowrap; }
+body.celular .tabela td { font-size: 15px; white-space: nowrap; }
+body.celular .tabela td.fraco { white-space: normal; min-width: 110px; }
+body.celular .tabela-grande td { padding-top: 12px; padding-bottom: 12px; }
+body.celular .tabela .acoes .btn-icone { padding: 9px; }
+body.celular .tabela .acoes .btn-icone svg { width: 20px; height: 20px; }
+
+body.celular .filtros .busca { max-width: none; }
+body.celular .abas { width: 100%; overflow-x: auto; }
+body.celular .abas button { flex: 1; white-space: nowrap; padding: 9px 10px; }
+
+/* Formulários em uma coluna */
+body.celular .grade-form { grid-template-columns: 1fr; }
+body.celular .form-linha { flex-direction: column; align-items: stretch; gap: 10px; }
+body.celular .form-linha .grupo { flex-direction: column; align-items: stretch; gap: 4px; }
+body.celular .form-linha .grupo > span { font-size: 14px; color: var(--cor-texto-suave); }
+body.celular .form-botoes { flex-wrap: wrap; }
+body.celular .form-botoes .btn { flex: 1; justify-content: center; }
+
+/* ---------- Orçamento: cada linha vira um "cartão" ---------- */
+body.celular .tabela-itens,
+body.celular .tabela-itens tbody,
+body.celular .tabela-itens tfoot { display: block; width: 100%; }
+body.celular .tabela-itens thead { display: none; }
+
+body.celular .tabela-itens tr[data-i],
+body.celular .tabela-itens tr[data-m],
+body.celular .tabela-itens .extras tr:not(.linha-secao) {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  grid-template-areas:
+    "descricao descricao acao"
+    "qtd unit unit"
+    "total total total";
+  gap: 4px 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--cor-borda-suave);
+}
+body.celular .tabela-itens tr > td { display: block; border: 0; padding: 0; }
+body.celular .tabela-itens tr > td:nth-child(1) { grid-area: descricao; }
+body.celular .tabela-itens tr > td:nth-child(2) { grid-area: qtd; }
+body.celular .tabela-itens tr > td:nth-child(3) { grid-area: unit; }
+body.celular .tabela-itens tr > td:nth-child(4) { grid-area: total; text-align: right; font-weight: 600; }
+body.celular .tabela-itens tr > td:nth-child(5) { grid-area: acao; align-self: center; }
+body.celular .tabela-itens tr > td:nth-child(5):empty { display: none; }
+body.celular .tabela-itens .extras tr:not(.linha-secao) > td:first-child { align-self: center; }
+
+/* No celular os campos ficam sempre com borda (não dá para "passar o mouse") */
+body.celular .tabela-itens input,
+body.celular .tabela-itens select {
+  border-color: var(--cor-borda);
+  background: #fff;
+  padding: 8px;
+}
+body.celular .tabela-itens .qtd input,
+body.celular .tabela-itens .dinheiro input { width: 100%; min-width: 0; }
+body.celular .tabela-itens .qtd,
+body.celular .tabela-itens .dinheiro { gap: 6px; }
+
+body.celular .tabela-itens .linha-secao,
+body.celular .tabela-itens .linha-add { display: block; }
+body.celular .tabela-itens .linha-secao td,
+body.celular .tabela-itens .linha-add td { display: block; }
+body.celular .tabela-itens .linha-add .btn-link { padding: 10px 0; font-size: 15px; }
+
+body.celular .tabela-itens tfoot tr {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: 2px solid var(--cor-texto);
+  padding-top: 10px;
+  margin-top: 6px;
+}
+body.celular .tabela-itens tfoot td { display: block; border: 0; padding: 0; font-size: 20px; }
+
+/* ---------- Janelas (modais) ocupam a tela toda ---------- */
+body.celular .modal-fundo { align-items: flex-end; }
+body.celular .modal {
+  width: 100vw;
+  max-height: calc(100dvh - var(--topo-seguro) - 20px);
+  border-radius: 12px 12px 0 0;
+  padding-bottom: var(--baixo-seguro);
+}
+body.celular .modal footer .btn { flex: 1; justify-content: center; }
+
+/* Avisos embaixo, ocupando a largura */
+body.celular .toasts { left: 10px; right: 10px; bottom: calc(14px + var(--baixo-seguro)); }
+body.celular .toast { max-width: none; }
+
+/* Configurações */
+body.celular .logo-preview { width: 100%; }
+body.celular [data-acao=pasta] { display: none !important; }
+body.celular .botoes-linha .btn { flex: 1 1 auto; justify-content: center; }

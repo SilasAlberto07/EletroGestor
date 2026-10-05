@@ -15,7 +15,9 @@
     "publicar": "electron-builder --win --publish always",
     "lancar": "npm version patch && git push --follow-tags",
     "lancar:funcao": "npm version minor && git push --follow-tags",
-    "lancar:grande": "npm version major && git push --follow-tags"
+    "lancar:grande": "npm version major && git push --follow-tags",
+    "apk": "npm --prefix mobile install && npm --prefix mobile run apk",
+    "celular:testar": "npm --prefix mobile install && npm --prefix mobile run testar"
   },
   "dependencies": {
     "electron-updater": "^6.8.9",

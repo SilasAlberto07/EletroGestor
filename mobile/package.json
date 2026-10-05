@@ -1,0 +1,27 @@
+{
+  "name": "eletrogestor-mobile",
+  "private": true,
+  "description": "Versão Android do EletroGestor (usa as mesmas telas e regras da pasta src)",
+  "type": "module",
+  "scripts": {
+    "montar": "node scripts/montar-web.mjs",
+    "testar": "node scripts/montar-web.mjs && node scripts/servidor-teste.mjs",
+    "android": "node scripts/montar-web.mjs && node scripts/preparar-android.mjs",
+    "apk": "node scripts/montar-web.mjs && node scripts/preparar-android.mjs && node scripts/gerar-apk.mjs",
+    "abrir-android-studio": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/filesystem": "^8.1.4",
+    "@capacitor/share": "^8.0.3",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.3",
+    "sql.js": "^1.14.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
+    "esbuild": "^0.28.2"
+  }
+}
