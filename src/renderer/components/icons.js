@@ -25,6 +25,12 @@ export const icones = {
     '<path d="M12 2.2 3 6.8v10.4l9 4.6 9-4.6V6.8zm0 2.3 6.2 3.2L12 10.9 5.8 7.7zM5 9.4l6 3.1v6.6l-6-3.1zm8 9.7v-6.6l6-3.1v6.6z"/>'
   ),
 
+  // Capacete de eletricista
+  maoobra: svg(
+    '<path d="M3.6 16.2A8.4 8.4 0 0 1 9.6 8.2V12h1.5V7.9a8.4 8.4 0 0 1 1.8 0V12h1.5V8.2a8.4 8.4 0 0 1 6 8z"/>' +
+      '<rect x="1.8" y="16.9" width="20.4" height="3.2" rx="1.2"/>'
+  ),
+
   configuracoes: svg(
     '<circle cx="12" cy="12" r="7.6" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="3 2.97"/>' +
       '<circle cx="12" cy="12" r="6.4" fill="none" stroke="currentColor" stroke-width="3.2"/>'

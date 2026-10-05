@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('api', {
   clientes: crud('clientes'),
   servicos: crud('servicos'),
   materiais: crud('materiais'),
+  maoObra: crud('maoObra'),
   config: {
     obter: chamar('config:obter'),
     salvar: chamar('config:salvar'),

@@ -29,6 +29,7 @@
   .num { text-align: right; white-space: nowrap; }
   .cen { text-align: center; white-space: nowrap; }
   tr.extra td { background: #f5f7fa; }
+  tr.secao td { background: #f5f7fa; font-size: 8.5pt; font-weight: 600; letter-spacing: 1.2px; color: #2f6fb5; padding: 5px 10px; }
   tr.total td { border-top: 2px solid #1f2933; border-bottom: none; font-size: 13pt; font-weight: 700; padding-top: 10px; }
   tr.total td.num { color: #2f6fb5; }
   .sem-itens { color: #8a94a0; font-style: italic; }
@@ -78,8 +79,8 @@
     </thead>
     <tbody>
       {{itens_html}}
-      <tr class="extra"><td>Mão de obra</td><td class="cen">-</td><td class="num">-</td><td class="num">{{mao_obra}}</td></tr>
-      <tr class="extra"><td>Deslocamento</td><td class="cen">-</td><td class="num">-</td><td class="num">{{deslocamento}}</td></tr>
+      {{mao_obra_html}}
+      {{deslocamento_html}}
       <tr class="total"><td colspan="3">TOTAL</td><td class="num">{{total}}</td></tr>
     </tbody>
   </table>

@@ -43,8 +43,8 @@ export async function render(raiz) {
 
         <div class="painel-cabecalho" style="margin-top:22px"><h2>Padrões do orçamento</h2></div>
         <div class="grade-form">
-          <label class="campo">Deslocamento padrão (R$)
-            <input name="deslocamento_padrao" inputmode="decimal" value="${formatarDecimal(lerNumero(config.deslocamento_padrao))}">
+          <label class="campo">Valor do KM padrão (R$)
+            <input name="valor_km_padrao" inputmode="decimal" value="${formatarDecimal(lerNumero(config.valor_km_padrao))}">
           </label>
           <label class="campo">Validade do orçamento (dias)
             <input name="validade_dias" type="number" min="1" value="${esc(config.validade_dias)}">
@@ -111,7 +111,7 @@ export async function render(raiz) {
     botao.disabled = true;
     try {
       const dados = Object.fromEntries(new FormData(e.target));
-      dados.deslocamento_padrao = String(lerNumero(dados.deslocamento_padrao));
+      dados.valor_km_padrao = String(lerNumero(dados.valor_km_padrao));
       await window.api.config.salvar(dados);
       avisar('Configurações salvas.');
     } catch (err) {

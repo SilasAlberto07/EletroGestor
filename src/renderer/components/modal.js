@@ -58,7 +58,7 @@ export function abrirModal({ titulo, corpo, textoConfirmar = 'Salvar', classeCon
   });
 
   document.body.appendChild(fundo);
-  const primeiroCampo = form.querySelector('input, select, textarea');
+  const primeiroCampo = form.querySelector('input:not([readonly]):not([disabled]), select:not([disabled]), textarea:not([readonly])');
   (primeiroCampo || botao).focus();
   return { fechar, form };
 }

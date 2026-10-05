@@ -44,16 +44,27 @@ function montarHtml(orc, cfg) {
   const validade = new Date(emissao);
   validade.setDate(validade.getDate() + (parseInt(cfg.validade_dias, 10) || 15));
 
+  const linha = (descricao, quantidade, unidade, unitario, total) =>
+    `<tr><td>${esc(descricao)}</td>
+      <td class="cen">${esc(numeroFmt.format(quantidade))} ${esc(unidade)}</td>
+      <td class="num">${moeda.format(unitario)}</td>
+      <td class="num">${moeda.format(total)}</td></tr>`;
+  const secao = (titulo) => `<tr class="secao"><td colspan="4">${titulo}</td></tr>`;
+
   const itensHtml = orc.itens.length
-    ? orc.itens
-        .map(
-          (i) => `<tr><td>${esc(i.descricao)}</td>
-            <td class="cen">${esc(numeroFmt.format(i.quantidade))} ${esc(i.unidade)}</td>
-            <td class="num">${moeda.format(i.unitario)}</td>
-            <td class="num">${moeda.format(i.total)}</td></tr>`
-        )
-        .join('')
-    : '<tr><td colspan="4" class="sem-itens">Sem materiais</td></tr>';
+    ? secao('MATERIAIS') + orc.itens.map((i) => linha(i.descricao, i.quantidade, i.unidade, i.unitario, i.total)).join('')
+    : '';
+
+  const maoObraHtml = orc.mao_obra_itens.length
+    ? secao('MÃO DE OBRA') +
+      orc.mao_obra_itens.map((m) => linha(m.descricao, m.quantidade, m.unidade, m.unitario, m.total)).join('')
+    : '';
+
+  const deslocamentoHtml =
+    orc.deslocamento > 0
+      ? secao('DESLOCAMENTO') +
+        linha('Deslocamento', orc.deslocamento_km, 'km', orc.deslocamento_valor_km, orc.deslocamento)
+      : '';
 
   const observacoes = [orc.observacoes, cfg.condicoes].filter(Boolean).join('\n\n');
 
@@ -74,8 +85,8 @@ function montarHtml(orc, cfg) {
     cliente_linha2: esc(orc.cliente_endereco),
     servico_nome: esc(orc.servico_nome || 'Serviço elétrico'),
     itens_html: itensHtml,
-    mao_obra: moeda.format(orc.mao_obra),
-    deslocamento: moeda.format(orc.deslocamento),
+    mao_obra_html: maoObraHtml,
+    deslocamento_html: deslocamentoHtml,
     total: moeda.format(orc.total),
     observacoes_html: observacoes
       ? `<div class="obs"><h2>OBSERVAÇÕES E CONDIÇÕES</h2><p>${esc(observacoes)}</p></div>`

@@ -36,9 +36,33 @@ function montar(dados) {
     item.total = dinheiro(item.quantidade * item.unitario);
   });
 
-  const maoObra = dinheiro(dados.mao_obra);
-  const deslocamento = dinheiro(dados.deslocamento);
-  if (maoObra < 0 || deslocamento < 0) throw new Error('Valores não podem ser negativos.');
+  // Lista de mão de obra: tipo x quantidade x valor
+  const maoObraItens = (dados.mao_obra_itens || [])
+    .map((linha) => ({
+      tipo_id: Number(linha.tipo_id) || null,
+      descricao: texto(linha.descricao),
+      unidade: texto(linha.unidade) || 'un',
+      quantidade: Number(linha.quantidade) || 0,
+      unitario: dinheiro(linha.unitario),
+    }))
+    .filter((linha) => linha.descricao || linha.quantidade || linha.unitario); // ignora linhas vazias
+
+  if (maoObraItens.length > 1) throw new Error('Informe apenas um tipo de mão de obra por orçamento.');
+
+  maoObraItens.forEach((linha) => {
+    if (!linha.tipo_id || !linha.descricao) throw new Error('Selecione o tipo de mão de obra.');
+    if (linha.quantidade <= 0) throw new Error(`Informe a quantidade de "${linha.descricao}".`);
+    if (linha.unitario < 0) throw new Error(`O valor de "${linha.descricao}" não pode ser negativo.`);
+    linha.total = dinheiro(linha.quantidade * linha.unitario);
+  });
+
+  // Deslocamento: KM x valor do KM
+  const km = Number(dados.deslocamento_km) || 0;
+  const valorKm = dinheiro(dados.deslocamento_valor_km);
+  if (km < 0 || valorKm < 0) throw new Error('Os valores do deslocamento não podem ser negativos.');
+
+  const maoObra = dinheiro(maoObraItens.reduce((soma, linha) => soma + linha.total, 0));
+  const deslocamento = dinheiro(km * valorKm);
 
   const totalMateriais = itens.reduce((soma, item) => soma + item.total, 0);
   const total = dinheiro(totalMateriais + maoObra + deslocamento);
@@ -49,9 +73,12 @@ function montar(dados) {
     servico_id: servicoId,
     mao_obra: maoObra,
     deslocamento,
+    deslocamento_km: km,
+    deslocamento_valor_km: valorKm,
     total,
     observacoes: texto(dados.observacoes),
     itens,
+    mao_obra_itens: maoObraItens,
   };
 }
 
@@ -64,6 +91,18 @@ function obter(id) {
   if (!orcamento) return null;
   orcamento.numero = numero(orcamento.id);
   orcamento.itens = repo.itens(id);
+  orcamento.mao_obra_itens = repo.maoObra(id);
+
+  // Orçamentos antigos (antes da lista de mão de obra / KM): mostra o valor como uma linha só
+  if (!orcamento.mao_obra_itens.length && orcamento.mao_obra > 0) {
+    orcamento.mao_obra_itens = [
+      { tipo_id: null, descricao: 'Mão de obra', unidade: 'un', quantidade: 1, unitario: orcamento.mao_obra, total: orcamento.mao_obra },
+    ];
+  }
+  if (!orcamento.deslocamento_km && orcamento.deslocamento > 0) {
+    orcamento.deslocamento_km = 1;
+    orcamento.deslocamento_valor_km = orcamento.deslocamento;
+  }
   return orcamento;
 }
 
@@ -75,10 +114,12 @@ function salvar(dados) {
       if (!repo.obter(orcamentoId)) throw new Error('Orçamento não encontrado.');
       repo.atualizar(orcamentoId, orc);
       repo.removerItens(orcamentoId);
+      repo.removerMaoObra(orcamentoId);
     } else {
       orcamentoId = repo.inserir(orc);
     }
     orc.itens.forEach((item) => repo.inserirItem(orcamentoId, item));
+    orc.mao_obra_itens.forEach((linha) => repo.inserirMaoObra(orcamentoId, linha));
     return orcamentoId;
   });
   return obter(id);

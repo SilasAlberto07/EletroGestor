@@ -5,6 +5,7 @@ const { registrarOrcamentos } = require('./orcamentos/orcamento.ipc');
 const { registrarClientes } = require('./clientes/cliente.ipc');
 const { registrarServicos } = require('./servicos/servico.ipc');
 const { registrarMateriais } = require('./materiais/material.ipc');
+const { registrarMaoObra } = require('./maoobra/maoobra.ipc');
 const { registrarConfiguracoes } = require('./configuracoes/configuracao.ipc');
 
 function registrarModulos() {
@@ -13,6 +14,7 @@ function registrarModulos() {
   registrarClientes();
   registrarServicos();
   registrarMateriais();
+  registrarMaoObra();
   registrarConfiguracoes();
 }
 

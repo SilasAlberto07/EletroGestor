@@ -32,7 +32,8 @@ function criarMenu() {
         { label: 'Clientes', accelerator: 'CmdOrCtrl+3', click: () => navegar('/clientes') },
         { label: 'Serviços', accelerator: 'CmdOrCtrl+4', click: () => navegar('/servicos') },
         { label: 'Materiais', accelerator: 'CmdOrCtrl+5', click: () => navegar('/materiais') },
-        { label: 'Configurações', accelerator: 'CmdOrCtrl+6', click: () => navegar('/configuracoes') },
+        { label: 'Mão de Obra', accelerator: 'CmdOrCtrl+6', click: () => navegar('/mao-de-obra') },
+        { label: 'Configurações', accelerator: 'CmdOrCtrl+7', click: () => navegar('/configuracoes') },
       ],
     },
     {

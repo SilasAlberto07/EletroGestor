@@ -39,21 +39,33 @@ function itens(orcamentoId) {
   return todos('SELECT * FROM orcamento_itens WHERE orcamento_id = ? ORDER BY id', [orcamentoId]);
 }
 
+// Quando não sobra nenhum orçamento (ex.: depois de apagar os de exemplo),
+// a numeração volta a começar do 001.
+function reiniciarNumeracaoSeVazio() {
+  if (um('SELECT COUNT(*) AS total FROM orcamentos').total > 0) return;
+  executar(
+    "DELETE FROM sqlite_sequence WHERE name IN ('orcamentos', 'orcamento_itens', 'orcamento_mao_obra')"
+  );
+}
+
 function inserir(o) {
+  reiniciarNumeracaoSeVazio();
   return executar(
-    `INSERT INTO orcamentos (cliente_id, servico_id, mao_obra, deslocamento, total, observacoes)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [o.cliente_id, o.servico_id, o.mao_obra, o.deslocamento, o.total, o.observacoes]
+    `INSERT INTO orcamentos (cliente_id, servico_id, mao_obra, deslocamento, deslocamento_km,
+                             deslocamento_valor_km, total, observacoes)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [o.cliente_id, o.servico_id, o.mao_obra, o.deslocamento, o.deslocamento_km, o.deslocamento_valor_km, o.total, o.observacoes]
   ).id;
 }
 
 function atualizar(id, o) {
   executar(
     `UPDATE orcamentos
-     SET cliente_id = ?, servico_id = ?, mao_obra = ?, deslocamento = ?, total = ?, observacoes = ?,
+     SET cliente_id = ?, servico_id = ?, mao_obra = ?, deslocamento = ?, deslocamento_km = ?,
+         deslocamento_valor_km = ?, total = ?, observacoes = ?,
          atualizado_em = datetime('now', 'localtime')
      WHERE id = ?`,
-    [o.cliente_id, o.servico_id, o.mao_obra, o.deslocamento, o.total, o.observacoes, id]
+    [o.cliente_id, o.servico_id, o.mao_obra, o.deslocamento, o.deslocamento_km, o.deslocamento_valor_km, o.total, o.observacoes, id]
   );
 }
 
@@ -69,6 +81,22 @@ function inserirItem(orcamentoId, item) {
   );
 }
 
+function maoObra(orcamentoId) {
+  return todos('SELECT * FROM orcamento_mao_obra WHERE orcamento_id = ? ORDER BY id', [orcamentoId]);
+}
+
+function removerMaoObra(orcamentoId) {
+  executar('DELETE FROM orcamento_mao_obra WHERE orcamento_id = ?', [orcamentoId]);
+}
+
+function inserirMaoObra(orcamentoId, linha) {
+  executar(
+    `INSERT INTO orcamento_mao_obra (orcamento_id, tipo_id, descricao, unidade, quantidade, unitario, total)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [orcamentoId, linha.tipo_id, linha.descricao, linha.unidade, linha.quantidade, linha.unitario, linha.total]
+  );
+}
+
 function atualizarStatus(id, status) {
   executar(
     "UPDATE orcamentos SET status = ?, atualizado_em = datetime('now', 'localtime') WHERE id = ?",
@@ -78,6 +106,7 @@ function atualizarStatus(id, status) {
 
 function excluir(id) {
   executar('DELETE FROM orcamentos WHERE id = ?', [id]);
+  reiniciarNumeracaoSeVazio();
 }
 
 module.exports = {
@@ -89,6 +118,9 @@ module.exports = {
   atualizar,
   removerItens,
   inserirItem,
+  maoObra,
+  removerMaoObra,
+  inserirMaoObra,
   atualizarStatus,
   excluir,
 };

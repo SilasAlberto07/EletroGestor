@@ -10,6 +10,7 @@ const CHAVES = [
   'empresa_endereco',
   'responsavel',
   'deslocamento_padrao',
+  'valor_km_padrao',
   'validade_dias',
   'condicoes',
 ];

@@ -14,10 +14,11 @@ let contador = 0;
  */
 export async function montarFormOrcamento(raiz, { id = null, compacto = false, aoSalvar } = {}) {
   const uid = `orc${++contador}`;
-  const [clientes, servicos, materiais, config] = await Promise.all([
+  const [clientes, servicos, materiais, tiposMaoObra, config] = await Promise.all([
     window.api.clientes.listar(),
     window.api.servicos.listar(),
     window.api.materiais.listar(),
+    window.api.maoObra.listar(),
     window.api.config.obter(),
   ]);
 
@@ -33,6 +34,10 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
     return { material_id: null, descricao: '', unidade: 'un', quantidade: 0, unitario: 0 };
   }
 
+  function linhaMaoObraVazia() {
+    return { tipo_id: null, descricao: '', unidade: '', quantidade: 0, unitario: 0 };
+  }
+
   function novoEstado() {
     return {
       id: null,
@@ -40,8 +45,9 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
       cliente_id: '',
       servico_id: '',
       itens: [linhaVazia()],
-      mao_obra: 0,
-      deslocamento: lerNumero(config.deslocamento_padrao),
+      maoObra: [linhaMaoObraVazia()],
+      deslocamento_km: 0,
+      deslocamento_valor_km: lerNumero(config.valor_km_padrao),
       observacoes: '',
     };
   }
@@ -53,10 +59,19 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
       cliente_id: o.cliente_id,
       servico_id: o.servico_id || '',
       itens: o.itens.length ? o.itens.map((i) => ({ ...i })) : [linhaVazia()],
-      mao_obra: o.mao_obra,
-      deslocamento: o.deslocamento,
+      // Uma única mão de obra por orçamento
+      maoObra: o.mao_obra_itens?.length ? [deMaoObra(o.mao_obra_itens[0])] : [linhaMaoObraVazia()],
+      deslocamento_km: o.deslocamento_km || 0,
+      deslocamento_valor_km: o.deslocamento_valor_km || 0,
       observacoes: o.observacoes || '',
     };
+  }
+
+  // Orçamento antigo (mão de obra sem tipo): mantém quantidade e valor,
+  // mas pede para escolher um dos tipos ao salvar
+  function deMaoObra(linha) {
+    const tipo = tiposMaoObra.find((t) => t.id == linha.tipo_id);
+    return tipo ? { ...linha } : { ...linha, tipo_id: null, descricao: '', unidade: '' };
   }
 
   async function carregar(orcamentoId) {
@@ -64,9 +79,14 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
     return o ? deOrcamento(o) : null;
   }
 
+  // Material, mão de obra e deslocamento usam a mesma conta: quantidade x valor
   const totalItem = (i) => Math.round(lerNumero(i.quantidade) * lerNumero(i.unitario) * 100) / 100;
+  const totalDeslocamento = () =>
+    totalItem({ quantidade: estado.deslocamento_km, unitario: estado.deslocamento_valor_km });
   const totalGeral = () =>
-    estado.itens.reduce((s, i) => s + totalItem(i), 0) + lerNumero(estado.mao_obra) + lerNumero(estado.deslocamento);
+    estado.itens.reduce((s, i) => s + totalItem(i), 0) +
+    estado.maoObra.reduce((s, m) => s + totalItem(m), 0) +
+    totalDeslocamento();
 
   // ---------- Tela ----------
   function opcoesClientes() {
@@ -121,15 +141,17 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
               <button type="button" class="btn btn-link" data-acao="adicionar">${icones.mais} Adicionar material</button>
             </td></tr>
           </tbody>
+          <tbody>
+            <tr class="linha-secao"><td colspan="5">MÃO DE OBRA</td></tr>
+          </tbody>
+          <tbody class="mao-obra"></tbody>
           <tbody class="extras">
+            <tr class="linha-secao"><td colspan="5">DESLOCAMENTO</td></tr>
             <tr>
-              <td>Mão de obra</td><td>-</td><td>-</td>
-              <td><div class="dinheiro"><span>R$</span><input data-campo="mao_obra" value="${formatarDecimal(estado.mao_obra)}" inputmode="decimal"></div></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>Deslocamento</td><td>-</td><td>-</td>
-              <td><div class="dinheiro"><span>R$</span><input data-campo="deslocamento" value="${formatarDecimal(estado.deslocamento)}" inputmode="decimal"></div></td>
+              <td>Deslocamento</td>
+              <td><div class="qtd"><input data-campo="deslocamento_km" value="${estado.deslocamento_km ? formatarQuantidade(estado.deslocamento_km) : ''}" inputmode="decimal" placeholder="0" title="Quantidade de KM"><span>km</span></div></td>
+              <td><div class="dinheiro"><span>R$</span><input data-campo="deslocamento_valor_km" value="${formatarDecimal(estado.deslocamento_valor_km)}" inputmode="decimal" title="Valor do KM"></div></td>
+              <td class="total-deslocamento">${formatarMoeda(totalDeslocamento())}</td>
               <td></td>
             </tr>
           </tbody>
@@ -152,6 +174,32 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
         </div>
       </section>`;
     renderItens();
+    renderMaoObra();
+  }
+
+  function opcoesMaoObra(linha) {
+    return `
+      <option value="">Selecione o tipo de mão de obra...</option>
+      ${tiposMaoObra
+        .map((t) => `<option value="${t.id}" ${t.id == linha.tipo_id ? 'selected' : ''}>${esc(t.descricao)}</option>`)
+        .join('')}`;
+  }
+
+  function renderMaoObra() {
+    const corpo = raiz.querySelector('tbody.mao-obra');
+    corpo.innerHTML = estado.maoObra
+      .map(
+        (linha, i) => `
+        <tr data-m="${i}">
+          <td><select data-mo="tipo_id">${opcoesMaoObra(linha)}</select></td>
+          <td><div class="qtd"><input data-mo="quantidade" value="${linha.quantidade ? formatarQuantidade(linha.quantidade) : ''}" inputmode="decimal" placeholder="0"><span>${esc(linha.unidade)}</span></div></td>
+          <td><div class="dinheiro"><span>R$</span><input data-mo="unitario" value="${formatarDecimal(linha.unitario)}" inputmode="decimal"></div></td>
+          <td class="total-item">${formatarMoeda(totalItem(linha))}</td>
+          <td></td>
+        </tr>`
+      )
+      .join('');
+    atualizarTotal();
   }
 
   function renderItens() {
@@ -204,8 +252,19 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
       return;
     }
 
-    if (alvo.dataset.campo === 'mao_obra' || alvo.dataset.campo === 'deslocamento') {
+    // Quantidade ou valor de uma linha de mão de obra
+    const linhaMo = alvo.closest('tr[data-m]');
+    if (linhaMo && (alvo.dataset.mo === 'quantidade' || alvo.dataset.mo === 'unitario')) {
+      const linha = estado.maoObra[linhaMo.dataset.m];
+      linha[alvo.dataset.mo] = lerNumero(alvo.value);
+      linhaMo.querySelector('.total-item').textContent = formatarMoeda(totalItem(linha));
+      atualizarTotal();
+      return;
+    }
+
+    if (alvo.dataset.campo === 'deslocamento_km' || alvo.dataset.campo === 'deslocamento_valor_km') {
       estado[alvo.dataset.campo] = lerNumero(alvo.value);
+      raiz.querySelector('.total-deslocamento').textContent = formatarMoeda(totalDeslocamento());
       atualizarTotal();
     } else if (alvo.dataset.campo === 'observacoes') {
       estado.observacoes = alvo.value;
@@ -215,9 +274,9 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
   // Ao sair do campo, formata o número ("4.8" -> "4,80")
   raiz.addEventListener('focusout', (e) => {
     const alvo = e.target;
-    const campo = alvo.dataset.item || alvo.dataset.campo;
-    if (['unitario', 'mao_obra', 'deslocamento'].includes(campo)) alvo.value = formatarDecimal(lerNumero(alvo.value));
-    if (campo === 'quantidade' && alvo.value) alvo.value = formatarQuantidade(lerNumero(alvo.value));
+    const campo = alvo.dataset.item || alvo.dataset.mo || alvo.dataset.campo;
+    if (['unitario', 'deslocamento_valor_km'].includes(campo)) alvo.value = formatarDecimal(lerNumero(alvo.value));
+    if (['quantidade', 'deslocamento_km'].includes(campo) && alvo.value) alvo.value = formatarQuantidade(lerNumero(alvo.value));
   });
 
   raiz.addEventListener('focusin', (e) => {
@@ -226,6 +285,29 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
 
   raiz.addEventListener('change', async (e) => {
     const alvo = e.target;
+
+    // Escolheu o tipo de mão de obra: preenche a unidade e o valor sugerido
+    if (alvo.dataset.mo === 'tipo_id') {
+      const tr = alvo.closest('tr[data-m]');
+      const linha = estado.maoObra[tr.dataset.m];
+      const tipo = tiposMaoObra.find((t) => t.id == alvo.value);
+      if (tipo) {
+        linha.tipo_id = tipo.id;
+        linha.descricao = tipo.descricao;
+        linha.unidade = tipo.unidade;
+        linha.unitario = tipo.preco;
+      } else {
+        Object.assign(linha, linhaMaoObraVazia());
+        tr.querySelector('[data-mo=quantidade]').value = '';
+      }
+      tr.querySelector('.qtd span').textContent = linha.unidade;
+      tr.querySelector('[data-mo=unitario]').value = formatarDecimal(linha.unitario);
+      tr.querySelector('.total-item').textContent = formatarMoeda(totalItem(linha));
+      atualizarTotal();
+      if (tipo) tr.querySelector('[data-mo=quantidade]').focus();
+      return;
+    }
+
     if (alvo.dataset.campo === 'cliente_id') {
       if (alvo.value === '__novo__') {
         alvo.value = estado.cliente_id || '';
@@ -235,16 +317,7 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
       }
     }
     if (alvo.dataset.campo === 'servico_id') {
-      const anterior = servicos.find((s) => s.id == estado.servico_id);
-      const novo = servicos.find((s) => s.id == alvo.value);
       estado.servico_id = alvo.value;
-      // Sugere a mão de obra padrão do serviço, se ainda não foi alterada à mão
-      const maoAtual = lerNumero(estado.mao_obra);
-      if (novo && (maoAtual === 0 || (anterior && maoAtual === anterior.mao_obra_padrao))) {
-        estado.mao_obra = novo.mao_obra_padrao;
-        raiz.querySelector('[data-campo=mao_obra]').value = formatarDecimal(novo.mao_obra_padrao);
-        atualizarTotal();
-      }
     }
   });
 
@@ -254,6 +327,7 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
       e.preventDefault();
       adicionarLinha();
     }
+
   });
 
   raiz.addEventListener('click', async (e) => {
@@ -322,8 +396,15 @@ export async function montarFormOrcamento(raiz, { id = null, compacto = false, a
           quantidade: lerNumero(i.quantidade),
           unitario: lerNumero(i.unitario),
         })),
-        mao_obra: lerNumero(estado.mao_obra),
-        deslocamento: lerNumero(estado.deslocamento),
+        mao_obra_itens: estado.maoObra.map((m) => ({
+          tipo_id: m.tipo_id,
+          descricao: m.descricao,
+          unidade: m.unidade,
+          quantidade: lerNumero(m.quantidade),
+          unitario: lerNumero(m.unitario),
+        })),
+        deslocamento_km: lerNumero(estado.deslocamento_km),
+        deslocamento_valor_km: lerNumero(estado.deslocamento_valor_km),
         observacoes: estado.observacoes,
       });
       const eraNovo = !estado.id;

@@ -9,6 +9,7 @@ const rotas = [
   { padrao: /^\/clientes$/, menu: 'clientes', pagina: () => import('../pages/clientes/clientes.js') },
   { padrao: /^\/servicos$/, menu: 'servicos', pagina: () => import('../pages/servicos/servicos.js') },
   { padrao: /^\/materiais$/, menu: 'materiais', pagina: () => import('../pages/materiais/materiais.js') },
+  { padrao: /^\/mao-de-obra$/, menu: 'maoobra', pagina: () => import('../pages/maoobra/maoobra.js') },
   { padrao: /^\/configuracoes$/, menu: 'configuracoes', pagina: () => import('../pages/configuracoes/configuracoes.js') },
 ];
 

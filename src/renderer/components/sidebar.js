@@ -7,6 +7,7 @@ const itens = [
   { rota: '/clientes', nome: 'Clientes', icone: 'clientes', chave: 'clientes' },
   { rota: '/servicos', nome: 'Serviços', icone: 'servicos', chave: 'servicos' },
   { rota: '/materiais', nome: 'Materiais', icone: 'materiais', chave: 'materiais' },
+  { rota: '/mao-de-obra', nome: 'Mão de Obra', icone: 'maoobra', chave: 'maoobra' },
   { rota: '/configuracoes', nome: 'Configurações', icone: 'configuracoes', chave: 'configuracoes' },
 ];
 

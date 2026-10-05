@@ -12,7 +12,10 @@ import { formatarDecimal, lerNumero } from '../js/utils/moeda.js';
  *   titulo: 'Clientes', singular: 'cliente', api: window.api.clientes,
  *   campos: [{ nome, rotulo, tipo: 'text'|'dinheiro'|'textarea'|'select', opcoes, obrigatorio, inteira }],
  *   colunas: [{ titulo, campo, formatar, classe }],
- *   campoNome: 'nome'  // usado na mensagem de exclusão
+ *   campoNome: 'nome',  // usado na mensagem de exclusão
+ *   permitirNovo: true, // false = esconde o botão "Novo"
+ *   acoes: ['editar', 'excluir'], // botões de cada linha
+ *   // campo.somenteLeitura: aparece no formulário, mas não pode ser alterado
  * }
  */
 export function criarPaginaCrud(cfg) {
@@ -22,7 +25,7 @@ export function criarPaginaCrud(cfg) {
         <div class="pagina">
           <div class="pagina-topo">
             <h1>${esc(cfg.titulo)}</h1>
-            <button class="btn btn-primario" data-acao="novo">${icones.mais} Novo ${esc(cfg.singular)}</button>
+            ${cfg.permitirNovo === false ? '' : `<button class="btn btn-primario" data-acao="novo">${icones.mais} Novo ${esc(cfg.singular)}</button>`}
           </div>
           <section class="painel">
             <div class="filtros">
@@ -42,7 +45,7 @@ export function criarPaginaCrud(cfg) {
           lista.innerHTML = tabela({
             colunas: cfg.colunas,
             linhas,
-            acoes: ['editar', 'excluir'],
+            acoes: cfg.acoes || ['editar', 'excluir'],
             clicavel: true,
             classe: 'tabela-grande',
             vazio: busca.value ? 'Nada encontrado para esta busca.' : `Nenhum ${cfg.singular} cadastrado ainda.`,
@@ -109,6 +112,13 @@ function campoHtml(campo, registro) {
   const obrigatorio = campo.obrigatorio ? ' <span class="obrigatorio">*</span>' : '';
   const classe = `campo ${campo.inteira ? 'inteira' : ''}`;
   let controle;
+
+  // Campo fixo: mostra o valor, mas não deixa editar (e não é enviado ao salvar)
+  if (campo.somenteLeitura && registro) {
+    const texto = campo.tipo === 'select' ? campo.opcoes.find((o) => o.valor === valor)?.nome ?? valor : valor;
+    controle = `<input value="${esc(texto)}" readonly tabindex="-1" class="somente-leitura">`;
+    return `<label class="${classe}"><span>${esc(campo.rotulo)}</span>${controle}</label>`;
+  }
 
   switch (campo.tipo) {
     case 'textarea':

@@ -134,6 +134,16 @@
 .tabela-itens .linha-add td { border-bottom: 1px solid var(--cor-borda-suave); }
 .tabela-itens .linha-add .btn-link { font-size: 14px; padding: 5px 0; }
 .tabela-itens .extras td:first-child { font-size: 15px; }
+.tabela-itens .linha-secao td { font-size: 14px; font-weight: 600; letter-spacing: .4px; padding: 12px 0 4px; color: var(--cor-texto-suave); }
+.tabela-itens select {
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 3px 2px;
+  font-size: 15px;
+}
+.tabela-itens select:hover { border-color: var(--cor-borda-suave); background: #fff; }
+.tabela-itens select:focus { border-color: var(--cor-primaria); background: #fff; }
 .tabela-itens tfoot td {
   border-top: 2px solid var(--cor-texto);
   border-bottom: none;
@@ -149,6 +159,7 @@
 /* ---------- Formulários em modal / configurações ---------- */
 .grade-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 .grade-form .inteira { grid-column: 1 / -1; }
+.grade-form input.somente-leitura { background: #f1f3f6; color: var(--cor-texto-suave); cursor: default; }
 
 /* ---------- Modal ---------- */
 .modal-fundo {
