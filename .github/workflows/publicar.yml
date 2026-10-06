@@ -28,6 +28,17 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      # Cria a Release ANTES de enviar os arquivos. Sem isso, o instalador e o
+      # .blockmap são enviados ao mesmo tempo e o GitHub cria duas Releases com o
+      # mesmo nome, com os arquivos divididos (e a atualização automática se perde).
+      - name: Criar a Release (uma só)
+        shell: bash
+        run: |
+          gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" --title "${GITHUB_REF_NAME#v}" --notes "Versão ${GITHUB_REF_NAME#v}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       # O usuário e o nome do repositório vêm do próprio GitHub,
       # assim não depende do que está escrito no electron-builder.yml.
       # "shell: bash" é necessário: o PowerShell quebra os argumentos "-c.publish...".
