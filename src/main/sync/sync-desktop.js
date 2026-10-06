@@ -203,6 +203,8 @@ const sync = criarSincronizacao({
   gravarMeta: async (meta) => gravarArquivo({ ...lerArquivo(), meta }),
   aoMudar: (estado) => avisarTelas('sync', estado),
   aoBaixar: () => avisarTelas('sync:dados', true),
+  // Só confere com a janela aberta (não minimizada)
+  podeConferir: () => BrowserWindow.getAllWindows().some((j) => j.isVisible() && !j.isMinimized()),
 });
 
 function registrarSincronizacao() {
@@ -226,13 +228,13 @@ function registrarSincronizacao() {
     return sync.desconectado();
   });
 
-  // Ao voltar para a janela, confere se o outro aparelho mudou algo (no máximo a cada 30 s)
+  // Ao voltar para a janela, confere na hora se o outro aparelho mudou algo
   let ultimaConferencia = 0;
   app.on('browser-window-focus', () => {
     const e = sync.estado();
-    if (!e.conectado || Date.now() - ultimaConferencia < 30000) return;
+    if (!e.conectado || Date.now() - ultimaConferencia < 5000) return;
     ultimaConferencia = Date.now();
-    sync.sincronizar();
+    sync.conferir();
   });
 }
 

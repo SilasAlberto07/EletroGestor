@@ -27,6 +27,7 @@ class ErroSemLogin extends Error {}
  *   gravarMeta(meta): Promise<void>
  *   aoMudar(estado): void                 avisa a tela
  *   aoBaixar(): void                      avisa a tela que os dados mudaram (recarregar)
+ *   podeConferir(): boolean               (opcional) se o app está aberto na tela agora
  * }
  */
 function criarSincronizacao(plataforma) {
@@ -118,13 +119,14 @@ function criarSincronizacao(plataforma) {
   }
 
   // ---------- Regras ----------
-  async function sincronizarUmaVez(escolha) {
+  async function sincronizarUmaVez(escolha, silencioso) {
     const m = await carregarMeta();
     if (!m.conectado) {
       mudar({ conectado: false, situacao: 'desconectado', mensagem: '' });
       return;
     }
-    mudar({ situacao: 'sincronizando', mensagem: '' });
+    // Conferência automática: só mostra "Sincronizando..." se realmente tiver algo para trazer/enviar
+    if (!silencioso) mudar({ situacao: 'sincronizando', mensagem: '' });
 
     const remoto = await procurarArquivo();
     const mudouNoDrive = remoto && remoto.md5Checksum !== m.md5Sincronizado;
@@ -148,6 +150,7 @@ function criarSincronizacao(plataforma) {
       });
       return;
     }
+    if (silencioso && acao !== 'nada') mudar({ situacao: 'sincronizando', mensagem: '' });
     if (acao === 'baixar') {
       const bytes = await baixar(remoto);
       plataforma.substituir(bytes);
@@ -169,8 +172,9 @@ function criarSincronizacao(plataforma) {
     mudar({ situacao: meta.alteradoLocal ? 'pendente' : 'ok', ultima: agora, mensagem: '', dataDrive: undefined });
   }
 
-  async function sincronizar(escolha) {
+  async function sincronizar(escolha, silencioso = false) {
     if (rodando) {
+      if (silencioso) return rodando; // já está sincronizando; a conferência automática não precisa repetir
       pedirDeNovo = true;
       return rodando;
     }
@@ -179,7 +183,7 @@ function criarSincronizacao(plataforma) {
         do {
           pedirDeNovo = false;
           try {
-            await sincronizarUmaVez(escolha);
+            await sincronizarUmaVez(escolha, silencioso);
           } catch (erro) {
             if (erro instanceof ErroSemLogin) {
               mudar({ situacao: 'login', mensagem: erro.message });
@@ -192,6 +196,7 @@ function criarSincronizacao(plataforma) {
             return;
           }
           escolha = undefined;
+          silencioso = false;
         } while (pedirDeNovo);
       } finally {
         rodando = null;
@@ -205,10 +210,13 @@ function criarSincronizacao(plataforma) {
       const m = await carregarMeta();
       mudar({ conectado: !!m.conectado, email: m.email || '', ultima: m.ultima || null, situacao: m.conectado ? 'ok' : 'desconectado' });
       if (m.conectado) await sincronizar();
-      // Se ficou algo sem enviar (ex.: sem internet), tenta de novo de tempos em tempos
+      // A cada 15 s, com o app aberto na tela: confere se o outro aparelho mudou algo
+      // (e reenvia o que tiver ficado pendente, ex.: sem internet)
       setInterval(() => {
-        if (meta && meta.conectado && meta.alteradoLocal) sincronizar();
-      }, 60 * 1000);
+        if (!meta || !meta.conectado || estado.situacao === 'conflito') return;
+        if (plataforma.podeConferir && !plataforma.podeConferir()) return;
+        sincronizar(undefined, true);
+      }, 15 * 1000);
     },
 
     // Chamado depois de fazer login no Google
@@ -235,10 +243,11 @@ function criarSincronizacao(plataforma) {
       clearTimeout(agendado);
       agendado = setTimeout(() => {
         if (estado.situacao !== 'conflito') sincronizar();
-      }, 3000);
+      }, 1500);
     },
 
     sincronizar: () => sincronizar(),
+    conferir: () => sincronizar(undefined, true),
     resolverConflito: (escolha) => sincronizar(escolha === 'local' ? 'local' : 'nuvem'),
     estado: () => ({ ...estado }),
   };
