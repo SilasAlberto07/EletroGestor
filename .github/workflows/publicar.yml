@@ -28,6 +28,19 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      # A chave secreta do Google não fica no código (o repositório é público).
+      # Ela vem do secret GOOGLE_CLIENT_SECRET e é gravada só dentro do instalador.
+      - name: Gravar a chave do Google
+        shell: bash
+        env:
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        run: |
+          if [ -z "$GOOGLE_CLIENT_SECRET" ]; then
+            echo "::error::Falta o segredo GOOGLE_CLIENT_SECRET no GitHub (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          node -e "require('fs').writeFileSync('src/main/sync/google-segredo.js', 'module.exports = ' + JSON.stringify(process.env.GOOGLE_CLIENT_SECRET.trim()) + ';\n')"
+
       # Cria a Release ANTES de enviar os arquivos. Sem isso, o instalador e o
       # .blockmap são enviados ao mesmo tempo e o GitHub cria duas Releases com o
       # mesmo nome, com os arquivos divididos (e a atualização automática se perde).

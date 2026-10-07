@@ -12,3 +12,6 @@ mobile/apk/
 mobile/src/migrations.gerado.js
 # Chave de assinatura do APK: NUNCA enviar para o GitHub (guarde uma cópia em lugar seguro)
 mobile/assinatura/
+
+# Chave secreta do Google (gerada na publicação a partir do secret GOOGLE_CLIENT_SECRET)
+src/main/sync/google-segredo.js

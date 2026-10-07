@@ -7,6 +7,16 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const config = require('./google-config');
+
+// Chave secreta do Google: gravada em google-segredo.js pela publicação no GitHub
+// (fora do repositório). Para rodar no seu computador, use a variável GOOGLE_CLIENT_SECRET.
+function chaveSecreta() {
+  try {
+    return require('./google-segredo');
+  } catch {
+    return process.env.GOOGLE_CLIENT_SECRET || '';
+  }
+}
 const { criarSincronizacao } = require('./sincronizacao');
 const { registrar } = require('../modules/ipc');
 const { exportarBanco, substituirBanco, definirAoAlterar, um } = require('../database/connection');
@@ -61,7 +71,7 @@ async function pedirToken(parametros) {
   const resposta = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ client_id: config.desktopClientId, client_secret: config.desktopClientSecret, ...parametros }),
+    body: new URLSearchParams({ client_id: config.desktopClientId, client_secret: chaveSecreta(), ...parametros }),
   });
   const json = await resposta.json();
   if (!resposta.ok) {
@@ -88,7 +98,7 @@ function paginaResposta(titulo, texto) {
 }
 
 function entrarComGoogle() {
-  if (config.desktopClientId.startsWith('PREENCHER')) {
+  if (config.desktopClientId.startsWith('PREENCHER') || !chaveSecreta()) {
     return Promise.reject(new Error('A sincronização ainda não foi configurada (códigos do Google Cloud).'));
   }
   return new Promise((resolver, rejeitar) => {

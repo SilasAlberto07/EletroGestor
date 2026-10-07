@@ -118,6 +118,8 @@ com a **mesma conta Google**. A partir daí:
 O arquivo fica no Drive com o nome `EletroGestor - dados (não apague).db`. O app só tem acesso a
 esse arquivo (permissão `drive.file`), nada mais do Drive.
 
-Os códigos do Google Cloud ficam em `src/main/sync/google-config.js`. O login do Android só funciona
+Os códigos do Google Cloud ficam em `src/main/sync/google-config.js`. A chave secreta do cliente
+"App para computador" fica só no secret `GOOGLE_CLIENT_SECRET` do GitHub (nunca no código, porque o
+repositório é público); para testar no computador, defina a variável de ambiente `GOOGLE_CLIENT_SECRET`. O login do Android só funciona
 no APK assinado com a chave da pasta `mobile/assinatura` (a impressão SHA-1 dela está cadastrada no
 Google Cloud, no cliente "EletroGestor Android").
