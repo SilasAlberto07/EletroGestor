@@ -90,6 +90,7 @@ async function sair() {
 const ouvintes = new Set();
 const ouvintesDados = new Set();
 let baixando = false;
+let appNaTela = true;
 
 const sync = criarSincronizacao({
   obterToken,
@@ -110,6 +111,7 @@ const sync = criarSincronizacao({
   gravarMeta,
   aoMudar: (estado) => ouvintes.forEach((f) => f(estado)),
   aoBaixar: () => ouvintesDados.forEach((f) => f()),
+  podeConferir: () => appNaTela,
 });
 
 export function iniciarSincronizacao(pronto) {
@@ -120,14 +122,16 @@ export function iniciarSincronizacao(pronto) {
     sync.iniciar().catch((e) => console.error('[sincronização]', e));
   });
 
-  // Ao voltar para o app, confere se o computador mudou algo (no máximo a cada 30 s)
+  // Ao voltar para o app, confere na hora se o computador mudou algo.
+  // Com o app em segundo plano, não fica conferindo (economiza bateria e internet).
   let ultima = 0;
   if (ehCelular()) {
-    App.addListener('resume', () => {
+    App.addListener('appStateChange', ({ isActive }) => {
+      appNaTela = isActive;
       const e = sync.estado();
-      if (!e.conectado || Date.now() - ultima < 30000) return;
+      if (!isActive || !e.conectado || Date.now() - ultima < 5000) return;
       ultima = Date.now();
-      sync.sincronizar();
+      sync.conferir();
     });
   }
 

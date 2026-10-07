@@ -81,9 +81,19 @@ export async function montarAvisoSincronizacao(elemento) {
 
   window.api.sync.aoMudar(render);
   // Outro aparelho mudou os dados: mostra a página de novo com os dados atualizados
+  // Se a pessoa estiver digitando (formulário aberto), não recarrega a tela no meio:
+  // os dados novos aparecem quando ela trocar de página ou salvar.
   window.api.sync.aoBaixar(() => {
-    avisar('Dados atualizados com as alterações do outro aparelho.');
-    if (!document.querySelector('.modal-fundo')) window.dispatchEvent(new HashChangeEvent('hashchange'));
+    const digitando =
+      document.querySelector('.modal-fundo') ||
+      document.activeElement?.matches?.('input, select, textarea') ||
+      /^#\/orcamentos\/(novo|\d+)$/.test(location.hash);
+    if (digitando) {
+      avisar('Chegaram alterações do outro aparelho. Elas aparecem ao trocar de página.');
+    } else {
+      avisar('Dados atualizados com as alterações do outro aparelho.');
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    }
   });
   render(await window.api.sync.estado());
 }
