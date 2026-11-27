@@ -29,8 +29,8 @@ export async function render(raiz) {
       raiz.querySelector('.cards').innerHTML = [
         card('Orçamentos deste mês', r.orcamentosMes),
         card('Aguardando aprovação', r.aguardando, 'laranja'),
-        card('Aprovados', r.aprovadosMes, 'verde'),
-        card('Valor total orçado', formatarMoedaCurta(r.valorMes), 'azul'),
+        card('Aprovados', r.aprovados, 'verde', `${formatarMoedaCurta(r.valorAprovado)} aprovados`),
+        card('Valor orçado este mês', formatarMoedaCurta(r.valorMes), 'azul'),
       ].join('');
 
       raiz.querySelector('.recentes').innerHTML = tabela({

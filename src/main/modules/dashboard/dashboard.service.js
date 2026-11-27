@@ -13,11 +13,18 @@ function resumo() {
      FROM orcamentos WHERE ${DESTE_MES}`
   );
   const aguardando = um("SELECT COUNT(*) AS total FROM orcamentos WHERE status = 'aguardando'").total;
+  // Aprovados: TODOS, de qualquer mês (antes só contava os criados no mês atual,
+  // e os aprovados "sumiam" quando o mês virava)
+  const aprovados = um(
+    "SELECT COUNT(*) AS quantidade, IFNULL(SUM(total), 0) AS valor FROM orcamentos WHERE status = 'aprovado'"
+  );
 
   return {
     orcamentosMes: mes.quantidade,
     aguardando,
     aprovadosMes: mes.aprovados || 0,
+    aprovados: aprovados.quantidade,
+    valorAprovado: aprovados.valor,
     valorMes: mes.valor,
     recentes: orcamentos.recentes(5).map((o) => ({ ...o, numero: numero(o.id) })),
   };

@@ -94,6 +94,7 @@ body.celular .painel { padding: 12px 10px; }
 body.celular .cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
 body.celular .card .card-titulo { font-size: 14px; }
 body.celular .card .card-valor { font-size: 26px; }
+body.celular .card .card-detalhe { font-size: 13px; }
 
 /* Listas (clientes, orçamentos...): rolam para o lado se não couberem */
 body.celular .lista, body.celular .recentes { overflow-x: auto; -webkit-overflow-scrolling: touch; }
